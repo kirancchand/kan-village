@@ -9,14 +9,22 @@ import ListingsSection from "./Components/ListingsSection.jsx";
 import PeopleSection from "./Components/PeopleSection.jsx";
 import Navbar from "./Components/Navbar.jsx";
 import LoginModal from "./Components/Login.jsx";
-
+import RegisterModal from "./Components/RegisterModal.jsx";
+import ForgotPasswordModal from "./Components/ForgotPasswordModal.jsx";
+import "bootstrap/dist/css/bootstrap.min.css";
+import AdvertisementSection from "./Components/AdvertisementSection";
+import AdvertisementLogin from "./Components/AdvertisementLogin.jsx";
+import BuySellSection from "./Components/BuySellSection.jsx"
 function PublicPage({ onLogin }) {
   return (
     <>
       <Carousel onLogin={onLogin} />
       <StatsBand />
+      <AdvertisementSection />
       <ImportantPersonsSection />
       <EmergencySection />
+      <BuySellSection />
+      
       <Footer loggedIn={false} />
     </>
   );
@@ -42,6 +50,9 @@ function Dashboard({ onLogout }) {
         <h1>Village Services Portal</h1>
         <p>Your complete guide — contacts, directories & local services</p>
       </div>
+      <div className="ad-curved">
+      <AdvertisementLogin />
+      </div>
       <CategoriesSection onFilter={handleFilter} />
       <ListingsSection activeCat={activeCat} onFilter={setActiveCat} />
       <PeopleSection />
@@ -56,6 +67,9 @@ function Dashboard({ onLogout }) {
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+ 
 
   // Inject CSS once
   useEffect(() => {
@@ -88,8 +102,40 @@ export default function App() {
         <PublicPage onLogin={() => setShowLogin(true)} />
       )}
       {showLogin && (
-        <LoginModal onClose={() => setShowLogin(false)} onSuccess={login} />
-      )}
+  <LoginModal
+    onClose={() => setShowLogin(false)}
+    onSuccess={login}
+    onRegister={() => {
+      setShowLogin(false);
+      setShowRegister(true);
+    }}
+    onForgotPassword={() => {
+    setShowLogin(false);
+    setShowForgotPassword(true);
+  }}
+  />
+)}
+
+{showRegister && (
+  <RegisterModal
+    onClose={() => setShowRegister(false)}
+    onLogin={() => {
+      setShowRegister(false);
+      setShowLogin(true);
+    }}
+  />
+)}
+
+{showForgotPassword && (
+  <ForgotPasswordModal
+    onClose={() => setShowForgotPassword(false)}
+    onBackToLogin={() => {
+      setShowForgotPassword(false);
+      setShowLogin(true);
+    }}
+  />
+)}
+
     </>
   );
 }
