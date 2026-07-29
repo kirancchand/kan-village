@@ -1,18 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
-import http from "../utils/http";
+import { useState, useEffect, useContext } from "react";
+import UserContext from "../UserContext.jsx";
 export default function Navbar({ loggedIn, onLogin, onLogout }) {
-  const [appName, setAppName] = useState("Gramam");
-  const fetchAppName = useCallback(async () => {
-    try {
-      const res = await http.get("/villageapps/getapp");
-      setAppName(res.data.villageapp_name);
-    } catch (err) {
-      console.error("Failed to fetch app name", err);
-    }
-  }, []);
-  useEffect(() => {
-    fetchAppName();
-  }, [fetchAppName]);
+  const { appName } = useContext(UserContext);
   
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {

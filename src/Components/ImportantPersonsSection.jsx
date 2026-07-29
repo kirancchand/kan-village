@@ -17,7 +17,7 @@ const linearGradients = [
   "linear-gradient(135deg,#0e7490,#0f766e)"
 ];
 
-const [person, setPerson] = useState(PERSONS);
+const [person, setPerson] = useState([]);
 
 const fetchImportantPersons = useCallback(async () => {
     try {
