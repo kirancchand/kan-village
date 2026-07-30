@@ -10,10 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.3.1",
     "formik": "^2.4.9",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-icons": "^5.7.0",
+    "react-router-dom": "^7.18.2",
+    "react-truncate-markup": "^5.1.2",
     "yup": "^1.7.1"
   },
   "devDependencies": {
