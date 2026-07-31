@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import TruncateMarkup from "react-truncate-markup";
-
+import { Card, CardBody } from "reactstrap";
 
 function BuySellSection({ onLogin, loggedIn }) {
 
@@ -32,9 +32,11 @@ const toggleDescription = (id) => {
     id: 1,
     flag: "BUY",
     title: "White Eggs",
+    heading: "Need fresh farm eggs",
     description: "Need fresh farm eggs from local farmers,its good for health,highly nutritions added.",
     name: "Govind",
     contact: "9539562001",
+    image: "/images/eggsImg.jpg",
     email: "govind@gmail.com"
   },
   {
@@ -42,7 +44,9 @@ const toggleDescription = (id) => {
     flag: "BUY",
     title: "Cow Milk",
     description: "Looking for fresh cow milk daily",
+    heading: "Looking for fresh cow milk daily",
     name: "Rahul",
+    image: "/images/milkImg.jpg",
     contact: "9539562002",
     email: "rahul@gmail.com"
   },
@@ -51,7 +55,9 @@ const toggleDescription = (id) => {
     flag: "BUY",
     title: "Mashrooms",
     description: "Organic mushrooms required",
+     heading: "Organic mushrooms required",
     name: "Arun",
+    image: "/images/mushroomImg.jpg",
     contact: "9539562003",
     email: "arun@gmail.com"
   },
@@ -59,7 +65,9 @@ const toggleDescription = (id) => {
     id: 4,
     flag: "BUY",
     title: "Fish",
+    heading: "Fresh fishes no using chemicals",
     description: "Fresh fishes no using chemicals",
+    image: "/images/fishImg.jpg",
     name: "Kumaran",
     contact: "953956421",
     email: "kumaran@gmail.com"
@@ -71,8 +79,10 @@ const toggleDescription = (id) => {
     id: 5,
     flag: "SELL",
     title: "Cow",
+     heading: "Healthy cow available for sale",
     description: "Healthy cow available for sale",
     name: "Sooraj",
+    image: "/images/cowImg.jpg",
     contact: "9539562011",
     email: "sooraj@gmail.com"
   },
@@ -80,8 +90,10 @@ const toggleDescription = (id) => {
     id: 6,
     flag: "SELL",
     title: "4bhk FLAT",
+    heading: "Spacious flat available near town",
     description: "Spacious flat available near town.its very scenic place situated in the heart of the city",
     name: "Nikhil",
+    image: "/images/flatImg.jpg",
     contact: "9539562012",
     email: "nikhil@gmail.com"
   },
@@ -89,6 +101,8 @@ const toggleDescription = (id) => {
     id:7,
     flag:"SELL",
     title:"ACTIVA SCOOTER 125CC",
+    heading: "Working condition, no bargaining",
+    image: "/images/scooterImg.jpg",
     description:"working condition, no bargaining ,amount is fixed",
     name:"Anand",
     contact:"6562326562"
@@ -96,9 +110,11 @@ const toggleDescription = (id) => {
   {
     id:8,
     flag:"SELL",
-    title:"ACTIVA SCOOTER 125CC",
+    title:"iphone 17 pro",
+    image: "/images/iphone17pro.jpg",
+    heading: "Working condition, no damages ,full neet piece",
     description:"working condition, no bargaining ,amount is fixed",
-    name:"Anand",
+    name:"Gokul",
     contact:"953624523"
   },
 ];
@@ -125,7 +141,7 @@ const maskContact = (number) => {
   return str.slice(0, -5) + "*****";
 };
 
-  const CARD_WIDTH = 200;
+  const CARD_WIDTH = 335;
   const GAP = 25;
 
   const scrollToIndex = (ref, index) => {
@@ -176,89 +192,82 @@ const maskContact = (number) => {
     return () => clearInterval(interval);
   }, [isSellHovered, sellItems.length]);
 const renderCard = (item) => (
-  <div className="marketCard" key={item.id}>
-    
-    <span className={`flag ${item.flag === "BUY" ? "buyFlag" : "sellFlag"}`}>
-      {item.flag}
-    </span>
+  <Card className="marketCard" key={item.id}>
 
-    <div className="cardBody">
-
-      <div
-  className={`buysell-badge ${
-    item.flag === "BUY" ? "buy-badge" : "sell-badge"
-  }`}
->
-  {item.title}
-</div>
-
-      <div className="buysell-content">
-
-  <div className="buysell-avatar">
-    <i className="fa fa-user"></i>
-  </div>
-
- <div className="buysell-description">
-
-{
-expandedCards[item.id] ? (
-  <>
-    <p>"{item.description}"</p>
-
-    <span
-      className="show-more-link"
-      onClick={() => toggleDescription(item.id)}
-    >
-      Show Less
-    </span>
-  </>
-)
-:
-(
-  <TruncateMarkup
-    lines={2}
-    ellipsis={
-      <span>
-        ...
-        <span
-          className="show-more-link"
-          onClick={() => toggleDescription(item.id)}
-        >
-          Show More →
-        </span>
-      </span>
-    }
+  <span
+    className={`flag ${
+      item.flag === "BUY" ? "buyFlag" : "sellFlag"
+    }`}
   >
-    <p>"{item.description}"</p>
-  </TruncateMarkup>
-)
-}
+    {item.flag}
+  </span>
 
+  <CardBody className="cardBody">
 
-<p className="buysell-name fw-bold">
-  - {item.name}
-</p>
+    <div
+      className={`buysell-badge ${
+        item.flag === "BUY"
+          ? "buy-badge"
+          : "sell-badge"
+      }`}
+    >
+      {item.title}
+    </div>
 
-<p
-  className="buysell-contact clickable-contact"
-  onClick={() => {
-    if (!loggedIn) {
-      onLogin();
-    }
-  }}
-  title={!loggedIn ? "Login to view contact number" : ""}
-  style={{ cursor: !loggedIn ? "pointer" : "default" }}
->
-  {loggedIn ? item.contact : maskContact(item.contact)}
-</p>
+    <div className="buysell-content">
 
-</div>
+      {/* Left Side Image */}
+      <div className="buysell-avatar">
 
-</div>
+        <div className="image-bg"></div>
+
+        <img
+          src={item.image}
+          alt={item.title}
+          className="product-image"
+        />
+
+      </div>
+      
+
+      {/* Right Side Content */}
+      <div className="buysell-description">
+
+        <h4 className="product-heading">
+          {item.heading}
+        </h4>
+
+        <p className="product-desc">
+    "{item.description}"
+  </p>
+
+        <p className="buysell-name">
+          
+          -{item.name}
+        </p>
+
+        <p
+          className="buysell-contact clickable-contact"
+          onClick={() => {
+            if (!loggedIn) {
+              onLogin();
+            }
+          }}
+        >
+          <i className="fa fa-phone"></i>
+
+          {loggedIn
+            ? item.contact
+            : maskContact(item.contact)}
+        </p>
+
+      </div>
 
     </div>
 
-  </div>
+  </CardBody>
+
+</Card>
 );
   return (
     <section className="buySellSection">

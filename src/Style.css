@@ -1634,7 +1634,7 @@ footer {
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  padding: 15px 0;
+   padding: 15px 15px; 
 
   /* Hide scrollbars */
   scrollbar-width: none;
@@ -1645,28 +1645,51 @@ footer {
 }
 /* Fixed-size Cards */
 .marketCard {
-  flex: 0 0 335px; /* Fixed card width */
-  width: 280px;
-  scroll-snap-align: start;
+  flex: 0 0 330px;
+  min-width: 140px ;
+  min-height: 180px;
   position: relative;
   background: #fff;
-  border-radius: 14px;
+  border-radius: 22px;
   overflow: hidden;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0,0,0,.12);
+  transition: .3s;
+   position: relative;
+     scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+/* Product Heading */
+.product-heading {
+  font-size: 12px;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 8px;
+  line-height: 1.4;
 }
 
-.marketCard:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+/* Product Description */
+.product-desc {
+  font-size: 12px;
+  font-style: italic ;
+  color: #000;
+  line-height: 1.1;
+  margin-bottom: 8px;
+  text-indent: 20px;
+  
+}
+
+
+
+.marketCard:hover{
+  transform: translateY(-8px);
+  box-shadow: 0 18px 35px rgba(0,0,0,.18);
 }
 @media (max-width: 900px) {
   .carouselContainer {
     justify-content: flex-start;
   }
 }
+
 /* Flag Tags */
 .flag {
   position: absolute;
@@ -1690,21 +1713,10 @@ footer {
   background: #dc3545;
 }
 
-.cardBody {
-  padding: 22px;
+.cardBody{
+  padding:10px;
 }
 
-.cardBody h5 {
-  color: #0f5132;
-  margin-bottom: 15px;
-  font-weight: 700;
-}
-
-.cardBody p {
-  margin: 8px 0;
-  color: #555;
-  font-size: 15px;
-}
 
 /* Carousel Buttons */
 .dotsContainer {
@@ -1748,18 +1760,16 @@ footer {
     right: 5px;
   }
 }
-.marketCard {
-  position: relative;
-}
+
 
 .cardBody {
-  padding: 20px;
+  padding: 10px;
 }
 
 .buysell-badge {
   display: inline-block;
-  margin-bottom: 15px;
-  padding: 5px 14px;
+ 
+  padding: 5px 15px;
   border-radius: 50px;
   font-size: 0.7rem;
   font-weight: 700;
@@ -1781,38 +1791,33 @@ footer {
   color: #dc3545;
 }
 
-.buysell-avatar {
-  width: 25px;
-  height: 25px;
-
-  border-radius: 50%;
-  background: #fff;
-  color: rgb(5, 0, 0);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  flex-shrink: 0;
-  border: 1px solid #050505;
-}
-
-.buysell-description p {
-  margin: 0;
-  color: #555;
-  font-size: 14px;
-  font-style: italic;
-}
 .buysell-content {
   display: flex;
   align-items: flex-start;
-  gap: 15px;
+  gap: 10px;          
+  margin-top: 10px;
+  
+}
+
+.buysell-avatar {
+  width: 110px;
+  height: 110px;
+  flex: 0 0 110px;    /* Fixed width */
+  border-radius: 18px;
+  overflow: hidden;
+  background: #e8f8ef;
+}
+
+.buysell-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .buysell-description {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+  flex: 1;            /* Takes remaining space */
+  min-width: 0;
 }
 
 .buysell-description p {
@@ -1821,13 +1826,13 @@ footer {
 
 .buysell-name {
   text-align: right;
-  margin-top: 8px !important;
+  font-size: 12px;
   color: #333;
   padding-right: 20px;
 }
 .buysell-contact {
   text-align: right;
-  margin-top: 8px !important;
+  font-size: 12px;
   color: #333;
   padding-right: 20px;
 }
@@ -1903,7 +1908,7 @@ footer {
 .filter-menu button {
   border: none;
   outline: none;
-  padding: 4px 8px;
+  padding: 4px 20px;
   border-radius: 30px;
   background: #f3f5f7;
   color: #555;
@@ -1956,12 +1961,13 @@ footer {
   position: absolute;
   right: 0;
   bottom: 75px;
-  width: 280px;
-
+  width: 500px;
+  height: 540px;
   background: white;
   border-radius: 15px;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  
 }
 
 /* Header */
@@ -1983,90 +1989,19 @@ footer {
   cursor: pointer;
 }
 
-/* Body */
-.chat-body {
-  padding: 20px;
-  text-align: center;
-  color: #333;
-}
-
-/* Add item button */
-.add-market-btn {
-  padding: 6px;
-  margin-top: 10px;
-  border: none;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #0f766e, #0284c7);
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.add-market-btn:hover {
-  background: linear-gradient(135deg, #0f766e, #0284c7);
-  transform: translateY(-2px);
-}
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.modal-content {
-  background: #fff;
-  width: 700px;
-  max-width: 95%;
-  max-height: 90vh;
-  overflow-y: auto;
-  border-radius: 12px;
-  padding: 20px;
-  position: relative;
-}
-
-.close-btn {
-  position: absolute;
-  right: 15px;
-  top: 15px;
-  border: none;
-  background: none;
-  font-size: 22px;
-  cursor: pointer;
-}
-/* Marketplace Form Container */
-.marketplace-form {
-  width: 100%;
-  max-width: 900px;
-  margin: 40px auto;
-  padding: 35px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  border-radius: 24px;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-}
-
-/* Heading */
-.marketplace-form h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  font-size: 28px;
-  font-weight: 700;
-  color: #2f2f2f;
-}
-
 /* Grid Layout */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 22px;
+  padding: 30px 20px;
 }
 
 .full-width {
+  grid-column: span 2;
+}
+.category-field,
+.itemname-field {
   grid-column: span 2;
 }
 
@@ -2299,4 +2234,62 @@ textarea {
   .radio-group {
     flex-direction: column;
   }
+}
+.chat-body {
+  position: relative;
+
+  max-height: 75vh;
+
+  overflow-y: auto;
+
+  padding: 15px;
+}
+
+/* floating scroll button */
+.preview-container {
+  display:flex;
+  gap:15px;
+  flex-wrap:wrap;
+  margin-top:15px;
+}
+
+
+.preview-card {
+  width:90px;
+  height:90px;
+  position:relative;
+  border-radius:12px;
+  overflow:hidden;
+}
+
+
+.preview-card img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+
+.remove-image {
+
+  position:absolute;
+
+  top:5px;
+
+  right:5px;
+
+  width:22px;
+
+  height:22px;
+
+  border:none;
+
+  border-radius:50%;
+
+  background:red;
+
+  color:white;
+
+  cursor:pointer;
+
 }

@@ -1,24 +1,30 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import AddMarketplaceItem from "./AddMarketplaceItem";
-export default function ChatWidget({ onAddItem }) {
+
+export default function ChatWidget() {
 
   const [open, setOpen] = useState(false);
-  const [showForm, setShowForm] = useState(false);
 
- const handleAddItem = () => {
-  setOpen(false);
-  setShowForm(true);
-};
-const handlePublish = (item) => {
-  console.log("New Item:", item);
+const chatBodyRef = useRef(null);
+  const handlePublish = (item) => {
+    console.log("New Item:", item);
 
-  // We will save the item in Step 3
-  setShowForm(false);
+    // API save later
+    setOpen(false);
+  };
+  const scrollToBottom = () => {
+  chatBodyRef.current?.scrollTo({
+    top: chatBodyRef.current.scrollHeight,
+    behavior: "smooth",
+  });
 };
+
 
   return (
     <div className="chat-widget">
 
+
+      {/* Floating Button */}
       <button
         className="chat-btn"
         onClick={() => setOpen(!open)}
@@ -27,50 +33,47 @@ const handlePublish = (item) => {
       </button>
 
 
+
+      {/* Chat Box */}
       {open && (
-        <div className="chat-box">
+
+        <div className="chat-box marketplace-chat">
+
 
           <div className="chat-header">
-            <span>Marketplace</span>
 
-            <button onClick={() => setOpen(false)}>
-              ✕
-            </button>
-          </div>
-           
-
-          <div className="chat-body">
-
-            <p>
-              Want to Sell or Buy something?
-            </p>
+            <span>
+              📦 Marketplace
+            </span>
 
             <button
-              className="add-market-btn"
-              onClick={handleAddItem}
+              onClick={() => setOpen(false)}
             >
-              <i className="fas fa-plus"></i>
-              Add Item
+              ✕
             </button>
 
           </div>
 
-        </div>
-      )}
-      {showForm && (
-  <div className="modal-overlay">
-    <div className="modal-content">
-      <button
-        className="close-btn"
-        onClick={() => setShowForm(false)}
-      >
-        ✕
-      </button>
 
-      <AddMarketplaceItem onPublish={handlePublish} />
-    </div>
-  </div>
-)}
+
+          <div 
+  className="chat-body"
+  ref={chatBodyRef}
+>
+
+  <AddMarketplaceItem 
+     onPublish={handlePublish}
+  />
+
+
+  
+
+
+</div>
+
+        </div>
+
+      )}
 
     </div>
   );
