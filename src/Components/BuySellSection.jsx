@@ -72,6 +72,18 @@ const toggleDescription = (id) => {
     contact: "953956421",
     email: "kumaran@gmail.com"
   },
+  {
+    id: 5,
+    flag: "BUY",
+    title: "Laptop",
+    heading: "no dmages ,refurbished item",
+    description: "Fresh ",
+    image: "/images/laptop.jpg",
+    name: "Kumaran",
+    contact: "953956421",
+    email: "kumaran@gmail.com"
+  },
+ 
 ];
 
   const sellItems = [
@@ -117,6 +129,18 @@ const toggleDescription = (id) => {
     name:"Gokul",
     contact:"953624523"
   },
+  {
+    id: 9,
+    flag: "SELL",
+    title: "PorkMeat",
+    heading: "Fresh  no using chemicals",
+    description: "Fresh  no using chemicals",
+    image: "/images/porkmeat.jpg",
+    name: "Kumaran",
+    contact: "953956421",
+    email: "kumaran@gmail.com"
+  },
+  
 ];
 
  const filterItems = (items) => {
@@ -141,25 +165,36 @@ const maskContact = (number) => {
   return str.slice(0, -5) + "*****";
 };
 
-  const CARD_WIDTH = 335;
-  const GAP = 25;
-
   const scrollToIndex = (ref, index) => {
-    if (ref.current) {
-      const targetScroll = index * (CARD_WIDTH + GAP);
-      ref.current.scrollTo({
-        left: targetScroll,
-        behavior: 'smooth'
-      });
-    }
-  };
+  if (!ref.current) return;
 
-  const handleScroll = (ref, setActiveIndex) => {
-    if (ref.current) {
-      const index = Math.round(ref.current.scrollLeft / (CARD_WIDTH + GAP));
-      setActiveIndex(index);
+  const cards = ref.current.querySelectorAll(".marketCard");
+
+  cards[index]?.scrollIntoView({
+    behavior: "smooth",
+    inline: "center",   // or "nearest"
+    block: "nearest",
+  });
+};
+const handleScroll = (ref, setActiveIndex) => {
+  if (!ref.current) return;
+
+  const cards = [...ref.current.children];
+
+  let closestIndex = 0;
+  let minDistance = Infinity;
+
+  cards.forEach((card, index) => {
+    const distance = Math.abs(card.offsetLeft - ref.current.scrollLeft);
+
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestIndex = index;
     }
-  };
+  });
+
+  setActiveIndex(closestIndex);
+};
 
   // 1. BUY CAROUSEL -> MOVES TO THE LEFT (0 -> 1 -> 2 -> 3...)
   useEffect(() => {
@@ -233,13 +268,43 @@ const renderCard = (item) => (
       {/* Right Side Content */}
       <div className="buysell-description">
 
-        <h4 className="product-heading">
-          {item.heading}
-        </h4>
+       <h4 className="product-heading">
+  {item.heading}
+</h4>
 
-        <p className="product-desc">
-    "{item.description}"
-  </p>
+{expandedCards[item.id] ? (
+  <>
+    <p className="product-desc">
+      {item.description}
+    </p>
+
+    <span
+      className="show-more-link"
+      onClick={() => toggleDescription(item.id)}
+    >
+      Show Less
+    </span>
+  </>
+) : (
+  <TruncateMarkup
+    lines={2}
+    ellipsis={
+      <span>
+        ...
+        <span
+          className="show-more-link"
+          onClick={() => toggleDescription(item.id)}
+        >
+          Show More
+        </span>
+      </span>
+    }
+  >
+    <p className="product-desc">
+      {item.description}
+    </p>
+  </TruncateMarkup>
+)}
 
         <p className="buysell-name">
           

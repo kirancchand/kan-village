@@ -1619,33 +1619,36 @@ footer {
 }
 /* Wrapper to position navigation arrows */
 .carouselWrapper {
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: relative;
-  width: 100%;
+  overflow: hidden;
 }
 /* Scroll Container with Native Snap */
 .carouselContainer {
   display: flex;
   gap: 25px;
-  width: 1055px; /* EXACT WIDTH TO SHOW ONLY 3 CARDS */
-  max-width: 100%; /* Keeps it responsive on smaller screens */
+  width: 1055px;              /* 330*3 + 25*2 */
+  margin: 0 auto;
   overflow-x: auto;
+  overflow-y: hidden;
+  padding: 15px 0px;
+
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-   padding: 15px 15px; 
 
-  /* Hide scrollbars */
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
+
 .carouselContainer::-webkit-scrollbar {
   display: none;
 }
+
 /* Fixed-size Cards */
 .marketCard {
-  flex: 0 0 330px;
+  flex: 0 0 335px;
   min-width: 140px ;
   min-height: 180px;
   position: relative;
@@ -1836,33 +1839,18 @@ footer {
   color: #333;
   padding-right: 20px;
 }
-.get-more-text {
-  margin-top: 12px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-  color: #409d6a;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.get-more-text .arrow {
-  font-size: 16px;
-}
-
-.get-more-text:hover {
-  color: #2f7d52;
-  gap: 10px; /* arrow moves slightly on hover */
-}
 .show-more-link {
   color: #2f7d52;
-  cursor: pointer;
-  font-size: 15px;
   font-weight: 600;
+  cursor: pointer;
+  margin-left: 4px;
 }
+
+.show-more-link:hover {
+  text-decoration: underline;
+}
+
+
 .market-search-row {
   display: flex;
   justify-content: center;
