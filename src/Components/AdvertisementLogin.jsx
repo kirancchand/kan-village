@@ -1,34 +1,51 @@
-import { useState, useEffect } from "react";
-
+import { useState, useEffect ,useCallback } from "react";
+import http from "../utils/http";
 export default function AdvertisementLogin() {
-  const ads = [
-    {
-      image: "/images/tourism.png",
-      tag: "Tourism",
-      title: "Green Valley Resort",
-      description:
-        "Experience luxury stays, nature trails and authentic Kerala cuisine.",
-      button: "Book Now",
-    },
-    {
-      image: "/images/bank.jpg",
-      tag: "Finance",
-      title: "Village Co-operative Bank",
-      description:
-        "Easy loans, savings accounts and digital banking services.",
-      button: "Apply Today",
-    },
-    {
-      image: "/images/shop.jpg",
-      tag: "Shopping",
-      title: "Gramam Mega Shopping Festival",
-      description:
-        "Exclusive offers on electronics, fashion and home essentials.",
-      button: "View Offers",
-    },
-  ];
+  // const ads = [
+  //   {
+  //     image: "/images/tourism.png",
+  //     tag: "Tourism",
+  //     title: "Green Valley Resort",
+  //     description:
+  //       "Experience luxury stays, nature trails and authentic Kerala cuisine.",
+  //     button: "Book Now",
+  //   },
+  //   {
+  //     image: "/images/bank.jpg",
+  //     tag: "Finance",
+  //     title: "Village Co-operative Bank",
+  //     description:
+  //       "Easy loans, savings accounts and digital banking services.",
+  //     button: "Apply Today",
+  //   },
+  //   {
+  //     image: "/images/shop.jpg",
+  //     tag: "Shopping",
+  //     title: "Gramam Mega Shopping Festival",
+  //     description:
+  //       "Exclusive offers on electronics, fashion and home essentials.",
+  //     button: "View Offers",
+  //   },
+  // ];
 
   const [active, setActive] = useState(0);
+
+    const [ads,setAds]=useState([])
+
+  const fetchAds = useCallback(async () => {
+
+      try {
+        const res = await http.post("/advertisements/getMyAdvertisement");
+        console.log("Fetched Emergency data:", res.data);
+        setAds(res.data);
+      } catch (err) {
+        console.error("Failed to fetch Emergency data", err);
+      }
+    }, []);
+    useEffect(() => {
+      
+      fetchAds();
+    }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -58,7 +75,7 @@ export default function AdvertisementLogin() {
       rgba(0,0,0,0.35),
       transparent
     ),
-    url(${ad.image})
+    url(${ad.advertisement_image})
   `,
             }}
           >
@@ -66,8 +83,8 @@ export default function AdvertisementLogin() {
 
             <div className="large-ad-content">
               <span>{ad.tag}</span>
-              <h2>{ad.title}</h2>
-              <p>{ad.description}</p>
+              <h2>{ad.advertisement_name}</h2>
+              <p>{ad.advertisement_desc}</p>
 
               <button>{ad.button}</button>
             </div>
