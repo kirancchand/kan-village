@@ -2,6 +2,8 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useContext } from "react";
 import UserContext from "../UserContext.jsx";
+import http from "../utils/http";
+import { REGISTER_USER,appId } from "../utils/constants.jsx";
 export default function RegisterModal({ onClose, onLogin }) {
   const { appName } = useContext(UserContext);
   const genderOptions = [
@@ -13,10 +15,20 @@ export default function RegisterModal({ onClose, onLogin }) {
       firstName: "",
       lastName: "",
       email: "",
+<<<<<<< HEAD
       mobileNo: "",
       password: "",
       dateOfBirth: "",
       gender: "",
+=======
+      userNameOrMobile: "",
+      password: "",
+      dateOfBirth: "",
+      gender: "",
+      status:null,
+      usertype:null,
+      appId: appId,
+>>>>>>> c6c1423ec0392ff4a7cd7a020feacebe11f760e5
     },
 
     validationSchema: Yup.object({
@@ -36,6 +48,7 @@ export default function RegisterModal({ onClose, onLogin }) {
 
       dateOfBirth: Yup.date().required("Date of Birth is required"),
 
+<<<<<<< HEAD
       gender: Yup.string().required("Gender is required"),
     }),
     onSubmit: (values) => {
@@ -64,6 +77,78 @@ export default function RegisterModal({ onClose, onLogin }) {
       onLogin();
       onClose();
     },
+=======
+  gender: Yup.string()
+    .required("Gender is required"),
+}),
+onSubmit: async(values) => {
+  const registerData = {
+    firstName: values.firstName,
+    lastName: values.lastName,
+    email: values.email,
+    username: values.username,
+    mobno: values.mobileNo,
+    password: values.password,
+    dateofbirth: values.dateOfBirth,
+    gender: values.gender,
+    status:null,
+    usertype:null,
+    appId: appId,
+  };
+
+
+//   {
+//     "username": "9567894563",
+// 	"firstName":"name105",//
+// 	"middleName":"name 2",
+// 	"lastName":"name 3",//
+// 	"email":"kiran105@gmail.com",//
+//     "mobno":"9567894563",//
+//     "password":"123456" ,//
+// 	"dateofbirth":"21/01/2022",
+//     "gender": {
+//         "value":1,
+//         "label":"male"
+//     },
+//     "status":null,
+//     "usertype": null,
+//     // "status":{
+//     //     "value":1,
+//     //     "label":"Active"
+//     // },
+//     // "usertype":{
+//     //     "value":1,
+//     //     "label":"admin"
+//     // },
+//     // "branch":{
+//     //     "value":2,
+//     //     "label":"ward name"
+//     // },
+//     "appId":1
+//     // "created_time":"21/01/2022",
+// 	// "updated_time":"21/01/2022"
+// }
+
+
+
+
+
+   try {
+        const res = await http.post(REGISTER_USER, registerData);
+        console.log("User registered successfully:", res.data);
+      } catch (err) {
+        console.error("Failed to register user", err);
+      }
+
+  console.log(registerData);
+
+  // API call here
+  // axios.post("/register", registerData);
+
+  // onLogin();
+  // onClose();
+},
+>>>>>>> c6c1423ec0392ff4a7cd7a020feacebe11f760e5
   });
 
   return (
