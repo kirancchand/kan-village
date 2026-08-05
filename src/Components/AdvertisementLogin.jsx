@@ -1,5 +1,6 @@
 import { useState, useEffect ,useCallback } from "react";
 import http from "../utils/http";
+import { GET_MY_ADVERTISEMENT } from "../utils/constants";
 export default function AdvertisementLogin() {
   // const ads = [
   //   {
@@ -35,7 +36,7 @@ export default function AdvertisementLogin() {
   const fetchAds = useCallback(async () => {
 
       try {
-        const res = await http.post("/advertisements/getMyAdvertisement");
+        const res = await http.post(GET_MY_ADVERTISEMENT);
         console.log("Fetched Emergency data:", res.data);
         setAds(res.data);
       } catch (err) {

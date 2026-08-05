@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import http from "../utils/http";
 import SectionTitle from "./SectionTitle";
+import { GET_IMPORTANT_PERSONS } from "../utils/constants";
 export default function ImportantPersonsSection() {
 const PERSONS = [
   { emoji: "👨‍💼", name: "Rajan Pillai",   role: "Panchayat President", badge: "President",   grad: "linear-gradient(135deg,#0f766e,#0284c7)", ph: "+91 94470 12345" },
@@ -21,7 +22,7 @@ const [person, setPerson] = useState([]);
 
 const fetchImportantPersons = useCallback(async () => {
     try {
-      const res = await http.get("/users/getImportantPersons");
+      const res = await http.get(GET_IMPORTANT_PERSONS);
       console.log("Fetched Important Persons data:", res.data);
       setPerson(res.data);
     } catch (err) {

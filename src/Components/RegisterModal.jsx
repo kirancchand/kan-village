@@ -3,7 +3,7 @@ import * as Yup from "yup";
 import { useContext } from "react";
 import UserContext from "../UserContext.jsx";
 import http from "../utils/http";
-import { REGISTER_USER,appId } from "../utils/constants.jsx";
+import { REGISTER_USER, appId } from "../utils/constants.jsx";
 export default function RegisterModal({ onClose, onLogin }) {
   const { appName } = useContext(UserContext);
   const genderOptions = [
@@ -15,20 +15,13 @@ export default function RegisterModal({ onClose, onLogin }) {
       firstName: "",
       lastName: "",
       email: "",
-<<<<<<< HEAD
       mobileNo: "",
       password: "",
       dateOfBirth: "",
       gender: "",
-=======
-      userNameOrMobile: "",
-      password: "",
-      dateOfBirth: "",
-      gender: "",
-      status:null,
-      usertype:null,
+      status: null,
+      usertype: null,
       appId: appId,
->>>>>>> c6c1423ec0392ff4a7cd7a020feacebe11f760e5
     },
 
     validationSchema: Yup.object({
@@ -48,107 +41,80 @@ export default function RegisterModal({ onClose, onLogin }) {
 
       dateOfBirth: Yup.date().required("Date of Birth is required"),
 
-<<<<<<< HEAD
       gender: Yup.string().required("Gender is required"),
     }),
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       const selectedGender = genderOptions.find(
         (gender) => gender.code === values.gender,
       );
 
+      const formattedDate = values.dateOfBirth.split("-").reverse().join("/");
+
       const registerData = {
+        username: values.mobileNo,
         firstName: values.firstName,
+
         lastName: values.lastName,
         email: values.email,
-        mobileNo: values.mobileNo,
+        mobno: values.mobileNo,
         password: values.password,
-        dateOfBirth: values.dateOfBirth,
+        dateofbirth: formattedDate,
         gender: {
           value: selectedGender.value,
           label: selectedGender.label,
         },
+        status: null,
+        usertype: null,
+        appId: appId,
       };
 
-      console.log(registerData);
+      //   {
+      //     "username": "9567894563",
+      // 	"firstName":"name105",//
+      // 	"middleName":"name 2",
+      // 	"lastName":"name 3",//
+      // 	"email":"kiran105@gmail.com",//
+      //     "mobno":"9567894563",//
+      //     "password":"123456" ,//
+      // 	"dateofbirth":"21/01/2022",
+      //     "gender": {
+      //         "value":1,
+      //         "label":"male"
+      //     },
+      //     "status":null,
+      //     "usertype": null,
+      //     // "status":{
+      //     //     "value":1,
+      //     //     "label":"Active"
+      //     // },
+      //     // "usertype":{
+      //     //     "value":1,
+      //     //     "label":"admin"
+      //     // },
+      //     // "branch":{
+      //     //     "value":2,
+      //     //     "label":"ward name"
+      //     // },
+      //     "appId":1
+      //     // "created_time":"21/01/2022",
+      // 	// "updated_time":"21/01/2022"
+      // }
 
-      // API call here
-      // axios.post("/register", registerData);
-
-      onLogin();
-      onClose();
-    },
-=======
-  gender: Yup.string()
-    .required("Gender is required"),
-}),
-onSubmit: async(values) => {
-  const registerData = {
-    firstName: values.firstName,
-    lastName: values.lastName,
-    email: values.email,
-    username: values.username,
-    mobno: values.mobileNo,
-    password: values.password,
-    dateofbirth: values.dateOfBirth,
-    gender: values.gender,
-    status:null,
-    usertype:null,
-    appId: appId,
-  };
-
-
-//   {
-//     "username": "9567894563",
-// 	"firstName":"name105",//
-// 	"middleName":"name 2",
-// 	"lastName":"name 3",//
-// 	"email":"kiran105@gmail.com",//
-//     "mobno":"9567894563",//
-//     "password":"123456" ,//
-// 	"dateofbirth":"21/01/2022",
-//     "gender": {
-//         "value":1,
-//         "label":"male"
-//     },
-//     "status":null,
-//     "usertype": null,
-//     // "status":{
-//     //     "value":1,
-//     //     "label":"Active"
-//     // },
-//     // "usertype":{
-//     //     "value":1,
-//     //     "label":"admin"
-//     // },
-//     // "branch":{
-//     //     "value":2,
-//     //     "label":"ward name"
-//     // },
-//     "appId":1
-//     // "created_time":"21/01/2022",
-// 	// "updated_time":"21/01/2022"
-// }
-
-
-
-
-
-   try {
+      try {
         const res = await http.post(REGISTER_USER, registerData);
         console.log("User registered successfully:", res.data);
       } catch (err) {
         console.error("Failed to register user", err);
       }
 
-  console.log(registerData);
+      console.log(registerData);
 
-  // API call here
-  // axios.post("/register", registerData);
+      // API call here
+      // axios.post("/register", registerData);
 
-  // onLogin();
-  // onClose();
-},
->>>>>>> c6c1423ec0392ff4a7cd7a020feacebe11f760e5
+      // onLogin();
+      // onClose();
+    },
   });
 
   return (
@@ -257,8 +223,12 @@ onSubmit: async(values) => {
               name="mobileNo"
               placeholder="Enter Mobile Number"
               value={formik.values.mobileNo}
-              onChange={formik.handleChange}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, "");
+                formik.setFieldValue("mobileNo", value);
+              }}
               onBlur={formik.handleBlur}
+              maxLength={10}
             />
 
             {formik.touched.mobileNo && formik.errors.mobileNo && (

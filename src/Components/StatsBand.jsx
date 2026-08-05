@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import http from "../utils/http";
+import { GET_ANALYTICS } from "../utils/constants";
 export default function StatsBand() {
 const STATS = [
   { num: "2,400+", lbl: "Residents" },
@@ -12,7 +13,7 @@ const [stats,setStats]=useState([])
 
 const fetchStats = useCallback(async () => {
     try {
-      const res = await http.get("/analytics");
+      const res = await http.get(GET_ANALYTICS);
       console.log("Fetched Emergency data:", res.data);
       setStats(res.data);
     } catch (err) {

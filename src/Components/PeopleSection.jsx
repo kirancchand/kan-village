@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import http from "../utils/http";
 import SectionTitle from "./SectionTitle";
+import { GET_PEOPLES_LIST } from "../utils/constants";
 export default function PeopleSection() {
 //     const PEOPLE = [
 //   { name: "Anitha Raj",      ward: "Ward 1", addr: "Puthenveedu, Main Road",     ph: "+91 94472 11111" },
@@ -43,7 +44,7 @@ const fetchPeoples = useCallback(async (startValue = start) => {
         ]
       }
       console.log(sizePerPage)
-      const res = await http.post("/users/list", payload);
+      const res = await http.post(GET_PEOPLES_LIST, payload);
       console.log("Fetched Peoples data:", res.data.result);
       setPeoples(res.data.result);
       setTotalCount(res.data.totalCount);

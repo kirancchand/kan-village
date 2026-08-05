@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import http from "../utils/http";
 import SectionTitle from "./SectionTitle";
+import { GET_CATEGORIES } from "../utils/constants";
 export default function CategoriesSection({ onFilter }) {
 const CATEGORIES = [
   { icon: "🏫", name: "Schools",      cat: "school",   count: 4 },
@@ -17,7 +18,7 @@ const [categories, setCategories] = useState(CATEGORIES);
 
 const fetchCategories = useCallback(async () => {
     try {
-      const res = await http.get("/organisations/getCategories");
+      const res = await http.get(GET_CATEGORIES);
       console.log("Fetched Categories data:", res.data);
       setCategories(res.data);
     } catch (err) {

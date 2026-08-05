@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import http from "../utils/http";
 import SectionTitle from "./SectionTitle";
+import { GET_ORGANISATIONS_CATEGORIES } from "../utils/constants";
+import { GET_ORGANISATIONS_BY_CATEGORIES } from "../utils/constants";
 export default function ListingsSection({ activeCat, onFilter }) {
     const LISTINGS = [
       { name: "Gramam High School",       cat: "school",   icon: "🏫", ph: "+91 474 2760300", ad: "Main Road, Ward 1" },
@@ -43,7 +45,7 @@ export default function ListingsSection({ activeCat, onFilter }) {
 
   const fetchCategories = useCallback(async () => {
     try {
-      const res = await http.get("/organisations/getCategories");
+      const res = await http.get(GET_ORGANISATIONS_CATEGORIES);
       console.log("Fetched Categories data:", res.data);
       setCategories(res.data);
     } catch (err) {
@@ -61,7 +63,7 @@ export default function ListingsSection({ activeCat, onFilter }) {
   const fetchOrganisationById = useCallback(async (activeCat) => {
     try {
 
-      const res = await http.post("/organisations/getOrganisationByCategory", { category: activeCat });
+      const res = await http.post(GET_ORGANISATIONS_BY_CATEGORIES, { category: activeCat });
       console.log("Fetched Categories data:", res.data);
       setOrganisations(res.data);
     } catch (err) {

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import http from "../utils/http";
+import { GET_VILLAGE_CAROUSEL } from "../utils/constants";
 export default function Carousel({ onLogin }) {
 const SLIDES = [
   {
@@ -31,7 +32,7 @@ const SLIDES = [
 const [Slides, setSlides] = useState(SLIDES);
 const fetchCarousel = useCallback(async () => {
     try {
-      const res = await http.post("/carousel/getVillageCarousel");
+      const res = await http.post(GET_VILLAGE_CAROUSEL);
       console.log("Fetched carousel data:", res.data);
       setSlides(res.data);
     } catch (err) {

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import http from "../utils/http";
 import SectionTitle from "./SectionTitle";
 import { Icon } from "@iconify/react";
+import { GET_EMERGENCY_ORGANISATION } from "../utils/constants";
 // https://icon-sets.iconify.design/?query=Fire
 export default function EmergencySection() {
 const EMERGENCY = [
@@ -19,7 +20,7 @@ const [emergency, setEmergency] = useState([]);
 
 const fetchEmergency = useCallback(async () => {
     try {
-      const res = await http.get("/organisations/getEmergencyOrganisation");
+      const res = await http.get(GET_EMERGENCY_ORGANISATION);
       console.log("Fetched Emergency data:", res.data);
       setEmergency(res.data);
     } catch (err) {

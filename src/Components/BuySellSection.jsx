@@ -170,11 +170,15 @@ const maskContact = (number) => {
 
   const cards = ref.current.querySelectorAll(".marketCard");
 
-  cards[index]?.scrollIntoView({
+  const card = cards[index];
+
+  if (!card) return;
+
+  ref.current.scrollTo({
+    left: card.offsetLeft,
     behavior: "smooth",
-    inline: "center",   // or "nearest"
-    block: "nearest",
   });
+
 };
 const handleScroll = (ref, setActiveIndex) => {
   if (!ref.current) return;
