@@ -11,3 +11,4 @@ export const GET_ORGANISATIONS_CATEGORIES = `${baseURL}/organisations/getCategor
 export const GET_PEOPLES_LIST = `${baseURL}/users/list`;
 export const GET_ANALYTICS = `${baseURL}/analytics`;
 export const GET_ORGANISATIONS_BY_CATEGORIES=`${baseURL}/organisations/getOrganisationByCategory`;
+export const LOGIN_USER = `${authURL}/login`;
