@@ -1,11 +1,13 @@
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useContext } from "react";
+import { useContext,useState } from "react";
 import UserContext from "../UserContext.jsx";
 import http from "../utils/http";
 import { REGISTER_USER, appId } from "../utils/constants.jsx";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 export default function RegisterModal({ onClose, onLogin }) {
   const { appName } = useContext(UserContext);
+  const [showPassword, setShowPassword] = useState(false);
   const genderOptions = [
     { value: 1, code: "male", label: "Male" },
     { value: 2, code: "female", label: "Female" },
@@ -236,18 +238,27 @@ export default function RegisterModal({ onClose, onLogin }) {
             )}
           </div>
           <div className="lfield">
-            <label>Password</label>
-            <input
-              type="password"
-              name="password"
-              value={formik.values.password}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
-            {formik.touched.password && formik.errors.password && (
-              <div className="error">{formik.errors.password}</div>
-            )}
-          </div>
+  <label>Password</label>
+
+  <div className="password-wrapper">
+    <input
+      type={showPassword ? "text" : "password"}
+      name="password"
+      value={formik.values.password}
+      onChange={formik.handleChange}
+      onBlur={formik.handleBlur}
+    />
+
+    <i
+      className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"} password-eye`}
+      onClick={() => setShowPassword(!showPassword)}
+    ></i>
+  </div>
+
+  {formik.touched.password && formik.errors.password && (
+    <div className="error">{formik.errors.password}</div>
+  )}
+</div>
 
           <button className="l-submit" type="submit">
             Register →
