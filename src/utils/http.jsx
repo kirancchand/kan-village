@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { baseURL, appId } from './constants';
 const http = axios.create({
-  // baseURL: baseURL
+  baseURL: baseURL
 });
 
 http.interceptors.request.use((config) => {
@@ -43,11 +43,15 @@ async function refreshToken() {
     //   removeAllLocalStorage()
     //   return null;
     // }
-    return null
+    return true
 }
 
 export function redirectToLogin() {
 
+}
+
+export function getAccessToken() {
+    return localStorage.getItem("access_token");
 }
 
 http.interceptors.request.use(

@@ -2,28 +2,41 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useContext } from "react";
 import UserContext from "../UserContext.jsx";
+import http from "../utils/http";
+import { LOGIN_USER } from "../utils/constants.jsx";
 export default function LoginModal({ onClose, onSuccess, onRegister,onForgotPassword,
  }) {
   const { appName } = useContext(UserContext);
   const formik = useFormik({
     initialValues: {
-      user: "village123",
+      username: "village123",
       password: "pass123",
     },
 
     validationSchema: Yup.object({
-      user: Yup.string()
+      username: Yup.string()
         .required("ID is required"),
 
       password: Yup.string()
         .required("Password is required"),
     }),
 
-    onSubmit: (values) => {
-      if (values.user === "village123" && values.password === "pass123") {
-        onSuccess();
-      } else {
-        alert("Invalid credentials");
+    onSubmit: async(values) => {
+      // if (values.username === "village123" && values.password === "pass123") {
+      //   onSuccess();
+      // } else {
+      //   alert("Invalid credentials");
+      // }
+       try {
+        const res = await http.post(LOGIN_USER, values);
+        console.log("User logged in successfully:", res.data);
+        if(res.data && res.data.access_token){
+          localStorage.setItem("access_token", res.data.access_token);
+          localStorage.setItem("refresh_token", res.data.refresh_token);
+          onSuccess();
+        }
+      } catch (err) {
+        console.error("Failed to login user", err);
       }
     },
   });
@@ -49,8 +62,8 @@ export default function LoginModal({ onClose, onSuccess, onRegister,onForgotPass
             <label>Mobile / Voter ID</label>
             <input
               type="text"
-              name="user"
-              value={formik.values.user}
+              name="username"
+              value={formik.values.username}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               placeholder="Enter your ID"
