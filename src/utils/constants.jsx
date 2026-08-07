@@ -1,5 +1,5 @@
-export const baseURL = "http://localhost:5001/api";
-export const authURL = "http://localhost:8084/auth";
+export const baseURL = "http://10.64.253.8:5001/api";
+export const authURL = "http://10.64.253.8:8084/auth";
 export const appId = "1";
 export const REGISTER_USER = `${authURL}/register`;
 export const GET_MY_ADVERTISEMENT =`${baseURL}/advertisements/getMyAdvertisement`;
