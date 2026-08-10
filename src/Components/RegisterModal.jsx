@@ -1,17 +1,29 @@
+import React,{useCallback,useEffect} from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useContext,useState } from "react";
 import UserContext from "../UserContext.jsx";
 import http from "../utils/http";
-import { REGISTER_USER, appId } from "../utils/constants.jsx";
+import { REGISTER_USER, appId,GET_ALLGENDER } from "../utils/constants.jsx";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 export default function RegisterModal({ onClose, onLogin }) {
   const { appName } = useContext(UserContext);
   const [showPassword, setShowPassword] = useState(false);
-  const genderOptions = [
-    { value: 1, code: "male", label: "Male" },
-    { value: 2, code: "female", label: "Female" },
-  ];
+  const [genderData, setGenderData] = useState([]);
+
+  const getGender = useCallback(async () => {
+    try {
+      const res = await http.post(GET_ALLGENDER);
+      console.log("Fetched Categories data:", res.data);
+      setGenderData(res.data.data);
+    } catch (err) {
+      console.error("Failed to fetch Categories data", err);
+    }
+  }, []);
+  useEffect(() => {
+    getGender();
+  }, []);
+
   const formik = useFormik({
     initialValues: {
       firstName: "",
@@ -20,53 +32,43 @@ export default function RegisterModal({ onClose, onLogin }) {
       mobileNo: "",
       password: "",
       dateOfBirth: "",
-      gender: "",
+      gender: null,
       status: null,
       usertype: null,
+      branch:{
+        value:localStorage.getItem("village_branch_id"),
+        label:localStorage.getItem("village_branch")
+      },
       appId: appId,
     },
 
     validationSchema: Yup.object({
       firstName: Yup.string().required("First Name is required"),
-
       lastName: Yup.string().required("Last Name is required"),
-
       email: Yup.string().email("Invalid email").required("Email is required"),
-
       mobileNo: Yup.string()
         .required("Mobile Number is required")
         .matches(/^[0-9]{10}$/, "Enter a valid 10-digit mobile number"),
-
       password: Yup.string()
         .min(6, "Minimum 6 characters required")
         .required("Password is required"),
-
       dateOfBirth: Yup.date().required("Date of Birth is required"),
-
-      gender: Yup.string().required("Gender is required"),
+      gender: Yup.object().required("Gender is required"),
     }),
     onSubmit: async (values) => {
-      const selectedGender = genderOptions.find(
-        (gender) => gender.code === values.gender,
-      );
-
       const formattedDate = values.dateOfBirth.split("-").reverse().join("/");
-
       const registerData = {
         username: values.mobileNo,
         firstName: values.firstName,
-
         lastName: values.lastName,
         email: values.email,
         mobno: values.mobileNo,
         password: values.password,
         dateofbirth: formattedDate,
-        gender: {
-          value: selectedGender.value,
-          label: selectedGender.label,
-        },
+        gender: values.gender,
         status: null,
         usertype: null,
+        branch:values.branch,
         appId: appId,
       };
 
@@ -104,7 +106,11 @@ export default function RegisterModal({ onClose, onLogin }) {
 
       try {
         const res = await http.post(REGISTER_USER, registerData);
-        console.log("User registered successfully:", res.data);
+        if(res.status==200){
+          alert("User registered successfully");
+          onLogin();
+          onClose();
+        }
       } catch (err) {
         console.error("Failed to register user", err);
       }
@@ -118,6 +124,48 @@ export default function RegisterModal({ onClose, onLogin }) {
       // onClose();
     },
   });
+
+    // {
+    //     "_index": "kan_userregister",
+    //     "_id": "a03f52c4-c407-4f7b-a429-1d8928b8c41f",
+    //     "_score": 1,
+    //     "_source": {
+    //       "_class": "com.project.kan.common.vo.ElasticUserRequest",
+    //       "id": "a03f52c4-c407-4f7b-a429-1d8928b8c41f",
+    //       "keycloakId": "53658b4e-f5cb-4268-beb8-158866ae8ed5",
+    //       "username": "9061315676",
+    //       "email": "arunamk9@gmail.com",
+    //       //"firstName": "aruna",
+    //       //"lastName": "mk",
+    //       "mobno": "9061315676",
+    //       //"dateofbirth": "02/08/2026",
+    //       //"gender": "Female",
+    //       "status": "Active",
+    //       "usertype": "Authorised User",
+    //       //"branch": "palode"
+    //     }
+    //   },
+
+    //    {
+    //     "_index": "kanuser",
+    //     "_id": "W8ezs5kB3Li4KCj6imQF",
+    //     "_score": 3.0316584,
+    //     "_source": {
+    //       "state": "Kerala",
+    //       "district": "Thiruvananthapuram",
+    //       "local_body_type": "Panchayat",
+    //       "local_body_name": "Nanniyode",
+    //       "ward": "PALODE",
+    //       "SerialNo": 30,
+    //       "Name": "Anithakumari",
+    //       "Guardian": "Peetahmbaran Nair",
+    //       "HouseNo": "005/302",
+    //       "HouseName": "Krishna Vilasam",
+    //       "Gender": "F",
+    //       "Age": 55,
+    //       "ID": "SEC032303453"
+    //     }
+    //   },
 
   return (
     <div
@@ -167,20 +215,26 @@ export default function RegisterModal({ onClose, onLogin }) {
 
             <div className="lfield">
               <label>Gender</label>
-              <select
-                name="gender"
-                value={formik.values.gender}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-              >
-                <option value="">Select Gender</option>
+            <select
+              name="gender"
+              value={formik.values.gender?.value || ""}
+              onChange={(e) => {
+                const selectedGender = genderData.find(
+                  (gender) => gender.value === e.target.value
+                );
 
-                {genderOptions.map((gender) => (
-                  <option key={gender.value} value={gender.code}>
-                    {gender.label}
-                  </option>
-                ))}
-              </select>
+                formik.setFieldValue("gender", selectedGender || null);
+              }}
+              onBlur={formik.handleBlur}
+            >
+              <option value="">Select Gender</option>
+
+              {genderData.map((gender) => (
+                <option key={gender.value} value={gender.value}>
+                  {gender.label}
+                </option>
+              ))}
+            </select>
 
               {formik.touched.gender && formik.errors.gender && (
                 <div className="error">{formik.errors.gender}</div>

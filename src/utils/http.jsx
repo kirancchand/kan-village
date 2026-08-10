@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { baseURL, appId } from './constants';
+import { baseURL, appId,REQUEST_APPDATA } from './constants';
 const http = axios.create({
-  baseURL: baseURL
+//   baseURL: baseURL
 });
 
 http.interceptors.request.use((config) => {
@@ -44,6 +44,24 @@ async function refreshToken() {
     //   return null;
     // }
     return true
+}
+
+
+export async  function requestAppData() {
+    try {
+      const response = await http({
+        method: 'GET',
+        url: REQUEST_APPDATA,
+      })
+      
+      const { village_branch_id, village_branch } = response.data;
+      localStorage.setItem("village_branch_id", village_branch_id);
+      localStorage.setItem("village_branch", village_branch);
+      return response.data;
+
+    } catch (error) {
+      return null;
+    }
 }
 
 export function redirectToLogin() {

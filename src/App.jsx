@@ -17,6 +17,7 @@ import AdvertisementLogin from "./Components/AdvertisementLogin.jsx";
 import AdvertisementSection from "./Components/AdvertisementSection.jsx";
 import BuySellSection from "./Components/BuySellSection.jsx";
 import ChatWidget from "./Components/ChatWidget";
+import { getAccessToken,requestAppData } from "./utils/http.jsx";
 // import "bootstrap/dist/css/bootstrap.min.css";
 function PublicPage({ onLogin, loggedIn }) {
   return (
@@ -26,7 +27,7 @@ function PublicPage({ onLogin, loggedIn }) {
       <AdvertisementSection />
       <ImportantPersonsSection />
       <EmergencySection />
-      <BuySellSection onLogin={onLogin} loggedIn={loggedIn} />
+      {/* <BuySellSection onLogin={onLogin} loggedIn={loggedIn} /> */}
       <Footer loggedIn={false} />
     </>
   );
@@ -59,8 +60,8 @@ function Dashboard({ onLogout }) {
       <CategoriesSection onFilter={handleFilter} />
       <ListingsSection activeCat={activeCat} onFilter={setActiveCat} />
       <PeopleSection />
-       <BuySellSection loggedIn={true} />
-       <ChatWidget />
+       {/* <BuySellSection loggedIn={true} />
+       <ChatWidget /> */}
       <Footer loggedIn onSignOut={onLogout} />
     </>
   );
@@ -70,13 +71,14 @@ function Dashboard({ onLogout }) {
    ROOT APP
 ───────────────────────────────────────── */
 export default function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(getAccessToken()!== null?true:false);
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   // Inject CSS once
   useEffect(() => {
+    requestAppData();
     const id = "gramam-styles";
     if (!document.getElementById(id)) {
       const s = document.createElement("style");
@@ -84,15 +86,19 @@ export default function App() {
       s.textContent = CSS;
       document.head.appendChild(s);
     }
+
+
   }, []);
 
 const login = () => {
   setLoggedIn(true);
-  localStorage.setItem("token", "true");
+  // localStorage.setItem("token", "true");
   setShowLogin(false);
 };
 
   const logout = () => {
+     localStorage.removeItem("access_token");
+     localStorage.removeItem("refresh_token");
     setLoggedIn(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };

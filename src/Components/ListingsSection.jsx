@@ -3,6 +3,7 @@ import http from "../utils/http";
 import SectionTitle from "./SectionTitle";
 import { GET_ORGANISATIONS_CATEGORIES } from "../utils/constants";
 import { GET_ORGANISATIONS_BY_CATEGORIES } from "../utils/constants";
+import { Icon } from "@iconify/react";
 export default function ListingsSection({ activeCat, onFilter }) {
     const LISTINGS = [
       { name: "Gramam High School",       cat: "school",   icon: "🏫", ph: "+91 474 2760300", ad: "Main Road, Ward 1" },
@@ -87,7 +88,8 @@ export default function ListingsSection({ activeCat, onFilter }) {
             className={`f-btn${activeCat === f.cat ? " active" : ""}`}
             onClick={() => onFilter(f.cat)}
           >
-            {emoji[i]}&nbsp; {f.cat}
+             {f.icon!=null ? <Icon icon={f.icon} width={16} height={16} /> : emoji[i]}&nbsp; {f.cat}
+            {/* {emoji[i]}&nbsp; {f.cat} */}
           </button>
         ))}
         {/* {filters.map((f) => (
@@ -103,12 +105,12 @@ export default function ListingsSection({ activeCat, onFilter }) {
       <div className="list-grid">
         {displayed.map((l,i) => (
           <div key={l.name} className="l-card">
-            <div className="l-icon">{organisationemoji[i]}</div>
+            <div className="l-icon"> {l.icon!=null ? <Icon icon={l.icon} width={36} height={36} /> : organisationemoji[i]}</div>
             <div>
               <h4>{l.organisation_name}</h4>
               <div className="l-tag">{l.organisation_type}</div>
-              <div className="l-ph">📞 {l.phone}</div>
-              <div className="l-ad">📍 {l.contact}</div>
+              <div className="l-ph">📞 {l.contact}</div>
+              <div className="l-ad">📍 {l.owner}</div>
             </div>
           </div>
         ))}

@@ -42,7 +42,7 @@ const fetchImportantPersons = useCallback(async () => {
         {person.map((p,i) => (
           <div key={i} className="p-card">
             <div className="p-top" style={{ background: linearGradients[i % linearGradients.length] }}>
-              <div className="p-badge">{p.badge}</div>
+              <div className="p-badge">{p.usertype}</div>
               <div className="p-avatar-ring">
                 <div className="p-avatar-inner" style={{ background: p.grad }}>{emoji[i % emoji.length]}</div>
               </div>

@@ -105,9 +105,9 @@ export default function AdvertisementSection() {
                 <p>{ad.advertisement_desc}</p>
               </div>
 
-              <button className="ad-cta-btn">
+              {/*<button className="ad-cta-btn">
                 {ad.button}
-              </button>
+              </button>*/}
             </div>
           ))}
         </div>

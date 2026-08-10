@@ -16,9 +16,9 @@ export default function Navbar({ loggedIn, onLogin, onLogout }) {
         <span className="g-brand-name">{appName}</span>
       </div>
       <div className="g-nav-links">
-        <a className="hide-m">Home</a>
-        <a className="hide-m">Emergency</a>
-        <a className="hide-m">About</a>
+        <a className="hide-m" style={{ cursor: "pointer" }}>Home</a>
+        <a className="hide-m" style={{ cursor: "pointer" }} href="#emergency">Emergency</a>
+        <a className="hide-m" style={{ cursor: "pointer" }}>About</a>
         {loggedIn ? (
           <button className="btn-logout" onClick={onLogout}>Sign Out</button>
         ) : (

@@ -1,5 +1,6 @@
-export const baseURL = "http://10.64.253.8:5001/api";
-export const authURL = "http://10.64.253.8:8084/auth";
+export const baseURL = "http://localhost:5001/api";
+export const authURL = "http://localhost:8084/auth";
+export const masterURL = "http://localhost:8070";
 export const appId = "1";
 export const REGISTER_USER = `${authURL}/register`;
 export const GET_MY_ADVERTISEMENT =`${baseURL}/advertisements/getMyAdvertisement`;
@@ -12,3 +13,5 @@ export const GET_PEOPLES_LIST = `${baseURL}/users/list`;
 export const GET_ANALYTICS = `${baseURL}/analytics`;
 export const GET_ORGANISATIONS_BY_CATEGORIES=`${baseURL}/organisations/getOrganisationByCategory`;
 export const LOGIN_USER = `${authURL}/login`;
+export const GET_ALLGENDER= `${masterURL}/master/gender/getAll`;
+export const REQUEST_APPDATA = `${baseURL}/villageapps/getapp`;

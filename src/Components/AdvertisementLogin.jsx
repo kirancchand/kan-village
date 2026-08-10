@@ -87,12 +87,12 @@ export default function AdvertisementLogin() {
               <h2>{ad.advertisement_name}</h2>
               <p>{ad.advertisement_desc}</p>
 
-              <button>{ad.button}</button>
+                {/*<button>{ad.button}</button>*/}
             </div>
           </div>
         ))}
       </div>
-
+   {/*
       <div className="large-ad-dots">
         {ads.map((_, index) => (
           <button
@@ -102,6 +102,7 @@ export default function AdvertisementLogin() {
           />
         ))}
       </div>
+      */}
     </section>
   );
 }
