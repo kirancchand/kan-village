@@ -1,10 +1,96 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import TruncateMarkup from "react-truncate-markup";
 import { Card, CardBody } from "reactstrap";
+import { LIST_MARKET_PRODUCT_ITEM, GET_PRODUCT_IMAGES } from "../utils/constants"
+import http from '../utils/http';
+import { Navigate } from 'react-router-dom';
+const imageCache = {};
+
+const extractImageIds = (rawImages) => {
+  if (!rawImages) return [];
+  if (Array.isArray(rawImages)) return rawImages;
+
+  if (typeof rawImages === "string") {
+    let str = rawImages.trim();
+    // Handle PostgreSQL array format: {"14","15"} or {14,15}
+    if (str.startsWith("{") && str.endsWith("}")) {
+      str = str.slice(1, -1).trim();
+      if (!str) return [];
+      return str.split(",").map((s) => s.replace(/["']/g, "").trim()).filter(Boolean);
+    }
+    // Handle JSON array format: ["14","15"]
+    if (str.startsWith("[") && str.endsWith("]")) {
+      try {
+        const parsed = JSON.parse(str);
+        if (Array.isArray(parsed)) return parsed;
+      } catch {
+        // fallback
+      }
+    }
+    // Handle comma-separated string
+    if (str.includes(",")) {
+      return str.split(",").map((s) => s.replace(/["'{}]/g, "").trim()).filter(Boolean);
+    }
+    return [str.replace(/["'{}]/g, "").trim()].filter(Boolean);
+  }
+
+  return [rawImages];
+};
+
+const ShowProductImages = React.memo(({ item }) => {
+  const imageIds = extractImageIds(item?.images);
+  const lastImageId = imageIds.length > 0 ? imageIds[imageIds.length - 1] : null;
+
+  const [pdctImage, setPdctImage] = useState(() => {
+    return lastImageId && imageCache[lastImageId] ? imageCache[lastImageId] : null;
+  });
+  const [loader, setLoader] = useState(false);
+
+  const fetchImage = useCallback(async () => {
+    if (!lastImageId) return;
+    if (imageCache[lastImageId]) {
+      setPdctImage(imageCache[lastImageId]);
+      return;
+    }
+    setLoader(true);
+    try {
+      const payload = {
+        "image_id": String(lastImageId)
+      };
+      const res = await http.post(GET_PRODUCT_IMAGES, payload);
+      // console.log("GET_PRODUCT_IMAGES", res);
+      imageCache[lastImageId] = res.data;
+      setPdctImage(res.data);
+    } catch (err) {
+      console.error("Failed to fetch product image", err);
+    } finally {
+      setLoader(false);
+    }
+  }, [lastImageId]);
+
+  useEffect(() => {
+    if (lastImageId && !imageCache[lastImageId]) {
+      fetchImage();
+    }
+  }, [fetchImage, lastImageId]);
+
+  if (loader) return "Loading...";
+
+  const imageSrc = pdctImage?.market_image || item?.image || (Array.isArray(item?.product_images) ? item.product_images[item.product_images.length - 1] : null);
+
+  return (
+    <img
+      src={imageSrc}
+      alt={item?.title || item?.product_name || "Product"}
+      className="product-image"
+    />
+  );
+});
 
 function BuySellSection({ onLogin, loggedIn }) {
-
+  let navigate = useNavigate()
   const buyContainerRef = useRef(null);
   const sellContainerRef = useRef(null);
 
@@ -16,189 +102,122 @@ function BuySellSection({ onLogin, loggedIn }) {
   const [expandedCards, setExpandedCards] = useState({});
   const [query, setQuery] = useState("");
   const [showFilter, setShowFilter] = useState(false);
-const [filterType, setFilterType] = useState("ALL");
-  
+  const [filterType, setFilterType] = useState("all");
 
 
-const toggleDescription = (id) => {
-  setExpandedCards((prev) => ({
-    ...prev,
-    [id]: !prev[id],
-  }));
-};
+  const [page, setPage] = useState(1);
 
-  const buyItems = [
-  {
-    id: 1,
-    flag: "BUY",
-    title: "White Eggs",
-    heading: "Need fresh farm eggs",
-    description: "Need fresh farm eggs from local farmers,its good for health,highly nutritions added.",
-    name: "Govind",
-    contact: "9539562001",
-    image: "/images/eggsImg.jpg",
-    email: "govind@gmail.com"
-  },
-  {
-    id: 2,
-    flag: "BUY",
-    title: "Cow Milk",
-    description: "Looking for fresh cow milk daily",
-    heading: "Looking for fresh cow milk daily",
-    name: "Rahul",
-    image: "/images/milkImg.jpg",
-    contact: "9539562002",
-    email: "rahul@gmail.com"
-  },
-  {
-    id: 3,
-    flag: "BUY",
-    title: "Mashrooms",
-    description: "Organic mushrooms required",
-     heading: "Organic mushrooms required",
-    name: "Arun",
-    image: "/images/mushroomImg.jpg",
-    contact: "9539562003",
-    email: "arun@gmail.com"
-  },
-  {
-    id: 4,
-    flag: "BUY",
-    title: "Fish",
-    heading: "Fresh fishes no using chemicals",
-    description: "Fresh fishes no using chemicals",
-    image: "/images/fishImg.jpg",
-    name: "Kumaran",
-    contact: "953956421",
-    email: "kumaran@gmail.com"
-  },
-  {
-    id: 5,
-    flag: "BUY",
-    title: "Laptop",
-    heading: "no dmages ,refurbished item",
-    description: "Fresh ",
-    image: "/images/laptop.jpg",
-    name: "Kumaran",
-    contact: "953956421",
-    email: "kumaran@gmail.com"
-  },
- 
-];
+  const [start, setStart] = useState(0);
+  const sizePerPage = 10;
 
-  const sellItems = [
-  {
-    id: 5,
-    flag: "SELL",
-    title: "Cow",
-     heading: "Healthy cow available for sale",
-    description: "Healthy cow available for sale",
-    name: "Sooraj",
-    image: "/images/cowImg.jpg",
-    contact: "9539562011",
-    email: "sooraj@gmail.com"
-  },
-  {
-    id: 6,
-    flag: "SELL",
-    title: "4bhk FLAT",
-    heading: "Spacious flat available near town",
-    description: "Spacious flat available near town.its very scenic place situated in the heart of the city",
-    name: "Nikhil",
-    image: "/images/flatImg.jpg",
-    contact: "9539562012",
-    email: "nikhil@gmail.com"
-  },
-  {
-    id:7,
-    flag:"SELL",
-    title:"ACTIVA SCOOTER 125CC",
-    heading: "Working condition, no bargaining",
-    image: "/images/scooterImg.jpg",
-    description:"working condition, no bargaining ,amount is fixed",
-    name:"Anand",
-    contact:"6562326562"
-  },
-  {
-    id:8,
-    flag:"SELL",
-    title:"iphone 17 pro",
-    image: "/images/iphone17pro.jpg",
-    heading: "Working condition, no damages ,full neet piece",
-    description:"working condition, no bargaining ,amount is fixed",
-    name:"Gokul",
-    contact:"953624523"
-  },
-  {
-    id: 9,
-    flag: "SELL",
-    title: "PorkMeat",
-    heading: "Fresh  no using chemicals",
-    description: "Fresh  no using chemicals",
-    image: "/images/porkmeat.jpg",
-    name: "Kumaran",
-    contact: "953956421",
-    email: "kumaran@gmail.com"
-  },
-  
-];
+  const [sellProduct, setSellProduct] = useState([]);
+  const [totalSellCount, setTotalSellCount] = useState(0);
 
- const filterItems = (items) => {
-  return items.filter((item) => {
-    const matchesSearch = `${item.title} ${item.description} ${item.name}`
-      .toLowerCase()
-      .includes(query.toLowerCase());
+  const [buyProduct, setBuyProduct] = useState([]);
+  const [totalBuyCount, setTotalBuyCount] = useState(0);
 
-    const matchesFilter =
-      filterType === "ALL" || item.flag === filterType;
+  const fetchProducts = useCallback(async (startValue = start, type) => {
+    try {
+      const payload = {
+        "start": startValue,
+        "numberofRows": sizePerPage,
+        "filter": [
+          {
+            "columnName": "type",
+            "value": type
+          }
+        ],
+        "sort": []
+      }
+      // console.log(sizePerPage)
+      const res = await http.post(LIST_MARKET_PRODUCT_ITEM, payload);
+      // console.log("Fetched Peoples data:", res.data.result);
+      if (type == "sell") {
+        setSellProduct(res.data.result);
+        setTotalSellCount(res.data.totalCount);
+      } else {
+        setBuyProduct(res.data.result);
+        setTotalBuyCount(res.data.totalCount);
+      }
 
-    return matchesSearch && matchesFilter;
-  });
-};
+    } catch (err) {
+      console.error("Failed to fetch Peoples data", err);
+    }
+  }, []);
 
-const filteredBuyItems = filterItems(buyItems);
-const filteredSellItems = filterItems(sellItems);
-const maskContact = (number) => {
-  if (!number) return "";
-  const str = number.toString();
+  useEffect(() => {
+    fetchProducts(start, "sell");
+    fetchProducts(start, "buy");
+  }, []);
 
-  return str.slice(0, -5) + "*****";
-};
+  const toggleDescription = (id) => {
+    setExpandedCards((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
+
+  const filterItems = (items) => {
+    return (items || []).filter((item) => {
+      const titleStr = item.product_name || item.title || "";
+      const descStr = item.product_desc || item.description || "";
+      const catStr = item.category_name || item.name || "";
+      const matchesSearch = `${titleStr} ${descStr} ${catStr}`
+        .toLowerCase()
+        .includes(query.toLowerCase());
+
+      const itemType = (item.type || item.flag || "").toLowerCase();
+      const matchesFilter =
+        filterType === "all" || itemType === filterType.toLowerCase();
+
+      return matchesSearch && matchesFilter;
+    });
+  };
+
+  const filteredBuyItems = filterItems(buyProduct);
+  const filteredSellItems = filterItems(sellProduct);
+  const maskContact = (number) => {
+    if (!number) return "";
+    const str = number.toString();
+
+    return str.slice(0, -5) + "*****";
+  };
 
   const scrollToIndex = (ref, index) => {
-  if (!ref.current) return;
+    if (!ref.current) return;
 
-  const cards = ref.current.querySelectorAll(".marketCard");
+    const cards = ref.current.querySelectorAll(".marketCard");
 
-  const card = cards[index];
+    const card = cards[index];
 
-  if (!card) return;
+    if (!card) return;
 
-  ref.current.scrollTo({
-    left: card.offsetLeft,
-    behavior: "smooth",
-  });
+    ref.current.scrollTo({
+      left: card.offsetLeft,
+      behavior: "smooth",
+    });
 
-};
-const handleScroll = (ref, setActiveIndex) => {
-  if (!ref.current) return;
+  };
+  const handleScroll = (ref, setActiveIndex) => {
+    if (!ref.current) return;
 
-  const cards = [...ref.current.children];
+    const cards = [...ref.current.children];
 
-  let closestIndex = 0;
-  let minDistance = Infinity;
+    let closestIndex = 0;
+    let minDistance = Infinity;
 
-  cards.forEach((card, index) => {
-    const distance = Math.abs(card.offsetLeft - ref.current.scrollLeft);
+    cards.forEach((card, index) => {
+      const distance = Math.abs(card.offsetLeft - ref.current.scrollLeft);
 
-    if (distance < minDistance) {
-      minDistance = distance;
-      closestIndex = index;
-    }
-  });
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = index;
+      }
+    });
 
-  setActiveIndex(closestIndex);
-};
+    setActiveIndex(closestIndex);
+  };
 
   // 1. BUY CAROUSEL -> MOVES TO THE LEFT (0 -> 1 -> 2 -> 3...)
   useEffect(() => {
@@ -206,14 +225,14 @@ const handleScroll = (ref, setActiveIndex) => {
 
     const interval = setInterval(() => {
       setBuyActiveIndex((prevIndex) => {
-        const nextIndex = (prevIndex + 1) % buyItems.length;
+        const nextIndex = (prevIndex + 1) % buyProduct.length;
         scrollToIndex(buyContainerRef, nextIndex);
         return nextIndex;
       });
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [isBuyHovered, buyItems.length]);
+  }, [isBuyHovered, buyProduct.length]);
 
   // 2. SELL CAROUSEL -> MOVES TO THE RIGHT (Starts from end or decrements index)
   useEffect(() => {
@@ -222,231 +241,296 @@ const handleScroll = (ref, setActiveIndex) => {
     const interval = setInterval(() => {
       setSellActiveIndex((prevIndex) => {
         // Decrements to scroll backwards/rightwards
-        const nextIndex = prevIndex - 1 < 0 ? sellItems.length - 1 : prevIndex - 1;
+        const nextIndex = prevIndex - 1 < 0 ? sellProduct.length - 1 : prevIndex - 1;
         scrollToIndex(sellContainerRef, nextIndex);
         return nextIndex;
       });
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [isSellHovered, sellItems.length]);
-const renderCard = (item) => (
-  <Card className="marketCard" key={item.id}>
+  }, [isSellHovered, sellProduct.length]);
 
-  <span
-    className={`flag ${
-      item.flag === "BUY" ? "buyFlag" : "sellFlag"
-    }`}
-  >
-    {item.flag}
-  </span>
+  const renderCard = (item) => (
+    // console.log("item", item),
+    <Card className="marketCard" key={item.id}>
 
-  <CardBody className="cardBody">
-
-    <div
-      className={`buysell-badge ${
-        item.flag === "BUY"
-          ? "buy-badge"
-          : "sell-badge"
-      }`}
-    >
-      {item.title}
-    </div>
-
-    <div className="buysell-content">
-
-      {/* Left Side Image */}
-      <div className="buysell-avatar">
-
-        <div className="image-bg"></div>
-
-        <img
-          src={item.image}
-          alt={item.title}
-          className="product-image"
-        />
-
-      </div>
-      
-
-      {/* Right Side Content */}
-      <div className="buysell-description">
-
-       <h4 className="product-heading">
-  {item.heading}
-</h4>
-
-{expandedCards[item.id] ? (
-  <>
-    <p className="product-desc">
-      {item.description}
-    </p>
-
-    <span
-      className="show-more-link"
-      onClick={() => toggleDescription(item.id)}
-    >
-      Show Less
-    </span>
-  </>
-) : (
-  <TruncateMarkup
-    lines={2}
-    ellipsis={
-      <span>
-        ...
-        <span
-          className="show-more-link"
-          onClick={() => toggleDescription(item.id)}
-        >
-          Show More
-        </span>
+      <span
+        className={`flag ${item.type === "buy" ? "buyFlag" : "sellFlag"
+          }`}
+      >
+        {item.type}
       </span>
-    }
-  >
-    <p className="product-desc">
-      {item.description}
-    </p>
-  </TruncateMarkup>
-)}
 
-        <p className="buysell-name">
-          
-          -{item.name}
-        </p>
+      <CardBody className="cardBody">
 
-        <p
-          className="buysell-contact clickable-contact"
-          onClick={() => {
-            if (!loggedIn) {
-              onLogin();
-            }
-          }}
+        <div
+          className={`buysell-badge ${item.type === "buy"
+            ? "buy-badge"
+            : "sell-badge"
+            }`}
         >
-          <i className="fa fa-phone"></i>
+          {item.category_name}
+        </div>
 
-          {loggedIn
-            ? item.contact
-            : maskContact(item.contact)}
-        </p>
+        <div className="buysell-content">
 
-      </div>
+          {/* Left Side Image */}
+          <div
+            className="buysell-avatar"
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate(`/product/${item.market_id || item.id}`, { state: { product: item } })}
+          >
 
-    </div>
+            <div className="image-bg"></div>
 
-  </CardBody>
+            <ShowProductImages item={item} />
 
-</Card>
-);
+          </div>
+
+
+          {/* Right Side Content */}
+          <div className="buysell-description">
+
+            <h4
+              className="product-heading"
+              style={{ cursor: "pointer" }}
+              onClick={() => navigate(`/product/${item.market_id || item.id}`, { state: { product: item } })}
+            >
+              {item.product_name}
+            </h4>
+
+            {expandedCards[item.id] ? (
+              <>
+                <p className="product-desc">
+                  {item.product_desc}
+                </p>
+
+                <span
+                  className="show-more-link"
+                  onClick={() => toggleDescription(item.id)}
+                >
+                  Show Less
+                </span>
+              </>
+            ) : (
+              <TruncateMarkup
+                lines={2}
+                ellipsis={
+                  <span>
+                    ...
+                    <span
+                      className="show-more-link"
+                      onClick={() => toggleDescription(item.id)}
+                    >
+                      Show More
+                    </span>
+                  </span>
+                }
+              >
+                <p className="product-desc">
+                  {item.product_desc}
+                </p>
+              </TruncateMarkup>
+            )}
+
+            <p className="buysell-name">
+
+              -{item.product_name}
+            </p>
+
+            <p
+              className="buysell-contact clickable-contact"
+              onClick={() => {
+                if (!loggedIn) {
+                  onLogin();
+                }
+              }}
+            >
+              <i className="fa fa-phone"></i>
+
+              {loggedIn
+                ? item.contact
+                : maskContact(item.contact)}
+            </p>
+
+          </div>
+
+        </div>
+
+      </CardBody>
+
+    </Card>
+  );
   return (
     <section className="buySellSection">
-  <div className="container">
-    <h2 className="sectionTitle">🛒 Marketplace</h2>
-      {showFilter && (
-      <div className="filter-menu">
-        <button
-          className={filterType === "ALL" ? "active-filter" : ""}
-          onClick={() => setFilterType("ALL")}
-        >
-          All
-        </button>
-
-        <button
-          className={filterType === "BUY" ? "active-filter" : ""}
-          onClick={() => setFilterType("BUY")}
-        >
-          Buy
-        </button>
-
-        <button
-          className={filterType === "SELL" ? "active-filter" : ""}
-          onClick={() => setFilterType("SELL")}
-        >
-          Sell
-        </button>
-      </div>
-    )}
-    <div className="market-search-row">
-      <input
-        className="market-search"
-        type="text"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search product, seller or description..."
-      />
-
-      <button
-        className="filter-btn"
-        onClick={() => setShowFilter(!showFilter)}
-        title="Filter"
-      >
-        <i className="fa fa-bars"></i>
-      </button>
-    </div>
-
-   
-        {/* BUY SECTION (Moves Left) */}
-        <div className="cardSection">
-          <div 
-            className="carouselWrapper"
-            onMouseEnter={() => setIsBuyHovered(true)}
-            onMouseLeave={() => setIsBuyHovered(false)}
+      <div className="container">
+        <h2 className="sectionTitle">🛒 Marketplace</h2>
+        <div className="filter-menu">
+          <button
+            className={filterType === "all" ? "active-filter" : ""}
+            onClick={() => setFilterType("all")}
           >
-            <div 
-              className="carouselContainer" 
-              ref={buyContainerRef}
-              onScroll={() => handleScroll(buyContainerRef, setBuyActiveIndex)}
-            >
-             {filteredBuyItems.map(renderCard)}
-            </div>
+            All
+          </button>
 
-            <div className="dotsContainer">
-              {filteredBuyItems.map((_, index) => (
-                <button
-                  key={index}
-                  className={`dot ${buyActiveIndex === index ? 'activeDot' : ''}`}
-                  onClick={() => {
-                    setBuyActiveIndex(index);
-                    scrollToIndex(buyContainerRef, index);
-                  }}
-                  aria-label={`Go to slide ${index + 1}`}
+          <button
+            className={filterType === "buy" ? "active-filter" : ""}
+            onClick={() => setFilterType("buy")}
+          >
+            Buy
+          </button>
+
+          <button
+            className={filterType === "sell" ? "active-filter" : ""}
+            onClick={() => setFilterType("sell")}
+          >
+            Sell
+          </button>
+        </div>
+        <div className="market-search-row">
+          <input
+            className="market-search"
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search product, seller or description..."
+          />
+
+          <div className="filter-btn-wrapper">
+            <button
+              className={`filter-btn ${showFilter ? "filter-btn-active" : ""}`}
+              onClick={() => setShowFilter(!showFilter)}
+              title="Filter"
+            >
+              <i className="fa fa-sliders-h"></i>
+            </button>
+
+            {showFilter && (
+              <>
+                <div
+                  className="filter-popover-backdrop"
+                  onClick={() => setShowFilter(false)}
                 />
-              ))}
-            </div>
+                <div className="filter-popover">
+                  <div className="filter-popover-header">
+                    <span>Filters</span>
+                    <button
+                      className="filter-popover-close"
+                      onClick={() => setShowFilter(false)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  <div className="filter-popover-body">
+                    {/* Category Filter */}
+                    <div className="filter-popover-group">
+                      <label className="filter-popover-label">Category</label>
+                      <div className="filter-chip-row">
+                        {["all", "buy", "sell"].map((type) => (
+                          <button
+                            key={type}
+                            className={`filter-chip ${filterType === type ? "filter-chip-active" : ""}`}
+                            onClick={() => setFilterType(type)}
+                          >
+                            {type === "all" ? "🛍 All" : type === "buy" ? "🛒 Buy" : "💰 Sell"}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Add more filter groups here in the future */}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
-        {/* SELL SECTION (Moves Right) */}
-        <div className="cardSection">
-          <div 
-            className="carouselWrapper"
-            onMouseEnter={() => setIsSellHovered(true)}
-            onMouseLeave={() => setIsSellHovered(false)}
-          >
-            <div 
-              className="carouselContainer" 
-              ref={sellContainerRef}
-              onScroll={() => handleScroll(sellContainerRef, setSellActiveIndex)}
+
+        {/* buy SECTION (Moves Left) */}
+        {(filterType === "all" || filterType === "buy") && (
+          <div className="cardSection">
+            <div
+              className="carouselWrapper"
+              onMouseEnter={() => setIsBuyHovered(true)}
+              onMouseLeave={() => setIsBuyHovered(false)}
             >
-              {filteredSellItems.map(renderCard)}
-            </div>
+              <div
+                className="carouselContainer"
+                ref={buyContainerRef}
+                onScroll={() => handleScroll(buyContainerRef, setBuyActiveIndex)}
+              >
+                {filteredBuyItems.map(renderCard)}
+              </div>
 
-            <div className="dotsContainer">
-              {filteredSellItems.map((_, index) => (
-                <button
-                  key={index}
-                  className={`dot ${sellActiveIndex === index ? 'activeDot' : ''}`}
-                  onClick={() => {
-                    setSellActiveIndex(index);
-                    scrollToIndex(sellContainerRef, index);
-                  }}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
+              <div className="dotsContainer">
+                {filteredBuyItems.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`dot ${buyActiveIndex === index ? 'activeDot' : ''}`}
+                    onClick={() => {
+                      setBuyActiveIndex(index);
+                      scrollToIndex(buyContainerRef, index);
+                    }}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          </div>)}
+
+        {/* sell SECTION (Moves Right) */}
+        {(filterType === "all" || filterType === "sell") && (
+          <div className="cardSection">
+            <div
+              className="carouselWrapper"
+              onMouseEnter={() => setIsSellHovered(true)}
+              onMouseLeave={() => setIsSellHovered(false)}
+            >
+              <div
+                className="carouselContainer"
+                ref={sellContainerRef}
+                onScroll={() => handleScroll(sellContainerRef, setSellActiveIndex)}
+              >
+                {filteredSellItems.map(renderCard)}
+              </div>
+
+              <div className="dotsContainer">
+                {filteredSellItems.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`dot ${sellActiveIndex === index ? 'activeDot' : ''}`}
+                    onClick={() => {
+                      setSellActiveIndex(index);
+                      scrollToIndex(sellContainerRef, index);
+                    }}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>)}
+        <div style={{ textAlign: "center", marginTop: "30px" }}>
+          <button
+            className="btn-show-more-marketplace"
+            onClick={() => navigate("/marketplace")}
+            style={{
+              padding: "12px 30px",
+              borderRadius: "25px",
+              background: "linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%)",
+              color: "#fff",
+              border: "none",
+              fontWeight: "600",
+              fontSize: "15px",
+              cursor: "pointer",
+              boxShadow: "0 4px 15px rgba(49, 130, 206, 0.3)",
+              transition: "all 0.2s ease"
+            }}
+          >
+            Show More Marketplace Items →
+          </button>
         </div>
-
       </div>
     </section>
   );

@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useContext } from "react";
-
+import { Routes, Route } from "react-router-dom";
+import MarketplacePage from "./Components/MarketplacePage.jsx";
+import ProductDetailPage from "./Components/ProductDetailPage.jsx";
 import Carousel from "./Components/Carousel.jsx";
 import StatsBand from "./Components/StatsBand.jsx";
 import ImportantPersonsSection from "./Components/ImportantPersonsSection.jsx";
@@ -18,7 +20,7 @@ import AdvertisementSection from "./Components/AdvertisementSection.jsx";
 import BuySellSection from "./Components/BuySellSection.jsx";
 import ChatWidget from "./Components/ChatWidget";
 import { getAccessToken,requestAppData } from "./utils/http.jsx";
-// import "bootstrap/dist/css/bootstrap.min.css";
+
 function PublicPage({ onLogin, loggedIn }) {
   return (
     <>
@@ -27,7 +29,7 @@ function PublicPage({ onLogin, loggedIn }) {
       <AdvertisementSection />
       <ImportantPersonsSection />
       <EmergencySection />
-      {/* <BuySellSection onLogin={onLogin} loggedIn={loggedIn} /> */}
+      <BuySellSection onLogin={onLogin} loggedIn={loggedIn} />
       <Footer loggedIn={false} />
     </>
   );
@@ -36,7 +38,7 @@ function PublicPage({ onLogin, loggedIn }) {
 /* ─────────────────────────────────────────
    DASHBOARD PAGE
 ───────────────────────────────────────── */
-function Dashboard({ onLogout }) {
+function Dashboard({ onLogout, onLogin }) {
   const [activeCat, setActiveCat] = useState("all");
   const { appName } = useContext(UserContext);
 
@@ -57,11 +59,11 @@ function Dashboard({ onLogout }) {
         <p>Your complete guide — contacts, directories & local services</p>
       </div>
       <AdvertisementLogin />
-      <CategoriesSection onFilter={handleFilter} />
+      {/* <CategoriesSection onFilter={handleFilter} /> */}
       <ListingsSection activeCat={activeCat} onFilter={setActiveCat} />
       <PeopleSection />
-       {/* <BuySellSection loggedIn={true} />
-       <ChatWidget /> */}
+      <BuySellSection onLogin={onLogin} loggedIn={true} />
+      <ChatWidget />
       <Footer loggedIn onSignOut={onLogout} />
     </>
   );
@@ -86,22 +88,25 @@ export default function App() {
       s.textContent = CSS;
       document.head.appendChild(s);
     }
-
-
   }, []);
 
-const login = () => {
-  setLoggedIn(true);
-  // localStorage.setItem("token", "true");
-  setShowLogin(false);
-};
+  const login = () => {
+    setLoggedIn(true);
+    setShowLogin(false);
+  };
 
   const logout = () => {
-     localStorage.removeItem("access_token");
-     localStorage.removeItem("refresh_token");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
     setLoggedIn(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const homeView = loggedIn ? (
+    <Dashboard onLogout={logout} onLogin={() => setShowLogin(true)} />
+  ) : (
+    <PublicPage onLogin={() => setShowLogin(true)} loggedIn={loggedIn} />
+  );
 
   return (
     <>
@@ -110,11 +115,29 @@ const login = () => {
         onLogin={() => setShowLogin(true)}
         onLogout={logout}
       />
-      {loggedIn ? (
-        <Dashboard onLogout={logout} />
-      ) : (
-        <PublicPage onLogin={() => setShowLogin(true)} />
-      )}
+      
+      <Routes>
+        <Route path="/" element={homeView} />
+        <Route
+          path="/marketplace"
+          element={
+            <MarketplacePage
+              onLogin={() => setShowLogin(true)}
+              loggedIn={loggedIn}
+            />
+          }
+        />
+        <Route
+          path="/product/:id"
+          element={
+            <ProductDetailPage
+              onLogin={() => setShowLogin(true)}
+              loggedIn={loggedIn}
+            />
+          }
+        />
+        <Route path="*" element={homeView} />
+      </Routes>
       {showLogin && (
         <LoginModal
           onClose={() => setShowLogin(false)}

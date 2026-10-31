@@ -3,39 +3,44 @@ import { useState } from "react";
 export default function AddMarketplaceItem({ onPublish }) {
   const [formData, setFormData] = useState({
     type: "sell",
-    category: "",
-    itemName: "",
-    description: "",
+    category_id: "",
+    category_name: "",
+    product_name: "",
+    product_desc: "",
     price: "",
     location: "",
-    contact: "",
-    images: [],
+    // contact: "",
+    product_images: [],
   });
 
   const handleChange = (e) => {
-  const { name, value, files } = e.target;
+    const { name, value, files } = e.target;
 
-  if (name === "images") {
+    if (name === "product_images") {
+      const selectedImages = Array.from(files);
 
-    const selectedImages = Array.from(files);
-
-    setFormData((prev) => ({
-      ...prev,
-      images: [
-        ...prev.images,
-        ...selectedImages
-      ].slice(0, 5)
-    }));
-
-  } else {
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value
-    }));
-
-  }
-};
+      setFormData((prev) => ({
+        ...prev,
+        product_images: [
+          ...prev.product_images,
+          ...selectedImages
+        ].slice(0, 5)
+      }));
+    } else if (name === "category_id") {
+      const selectedOption = e.target.options[e.target.selectedIndex];
+      const categoryName = selectedOption.getAttribute("data-name") || (selectedOption.value ? selectedOption.text : "");
+      setFormData((prev) => ({
+        ...prev,
+        category_id: value,
+        category_name: categoryName
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -44,13 +49,14 @@ export default function AddMarketplaceItem({ onPublish }) {
 
     setFormData({
       type: "sell",
-      category: "",
-      itemName: "",
-      description: "",
+      category_id: "",
+      category_name: "",
+      product_name: "",
+      product_desc: "",
       price: "",
       location: "",
-      contact: "",
-      images: [],
+      // contact: "",
+      product_images: [],
     });
   };
 
@@ -87,16 +93,16 @@ export default function AddMarketplaceItem({ onPublish }) {
         {/* Category */}
         <div className="form-group category-field">
           <select
-            name="category"
-            value={formData.category}
+            name="category_id"
+            value={formData.category_id}
             onChange={handleChange}
           >
             <option value="">Select Category</option>
-            <option>Vehicles</option>
-            <option>Electronics</option>
-            <option>Furniture</option>
-            <option>Property</option>
-            <option>Livestock</option>
+            <option value="1" data-name="Vehicles">Vehicles</option>
+            <option value="2" data-name="Electronics">Electronics</option>
+            <option value="3" data-name="Furniture">Furniture</option>
+            <option value="4" data-name="Property">Property</option>
+            <option value="5" data-name="Livestock">Livestock</option>
           </select>
         </div>
 
@@ -104,18 +110,19 @@ export default function AddMarketplaceItem({ onPublish }) {
         <div className="form-group itemname-field">
           <input
             type="text"
-            name="itemName"
+            name="product_name"
             placeholder="Enter Item Name"
-            value={formData.itemName}
+            value={formData.product_name}
             onChange={handleChange}
           />
         </div>
+
         {/* Description */}
         <div className="form-group full-width">
           <textarea
-            name="description"
+            name="product_desc"
             placeholder="Describe your item..."
-            value={formData.description}
+            value={formData.product_desc}
             onChange={handleChange}
           />
         </div>
@@ -141,6 +148,17 @@ export default function AddMarketplaceItem({ onPublish }) {
           />
         </div>
 
+        {/* Contact */}
+        {/* <div className="form-group">
+          <input
+            type="text"
+            name="contact"
+            placeholder="Contact Number / Details"
+            value={formData.contact}
+            onChange={handleChange}
+          />
+        </div> */}
+
         {/* Upload */}
         <div className="form-group full-width">
           <label className="upload-box">
@@ -154,48 +172,48 @@ export default function AddMarketplaceItem({ onPublish }) {
 
             <input
               type="file"
-              name="images"
+              name="product_images"
               multiple
               accept="image/*"
               onChange={handleChange}
               hidden
             />
           </label>
-{formData.images.length > 0 && (
-  <div className="preview-container">
+          {formData.product_images.length > 0 && (
+            <div className="preview-container">
 
-    {formData.images.map((image, index) => (
+              {formData.product_images.map((image, index) => (
 
-      <div className="preview-card" key={index}>
+                <div className="preview-card" key={index}>
 
-        <img
-          src={URL.createObjectURL(image)}
-          alt="preview"
-        />
+                  <img
+                    src={URL.createObjectURL(image)}
+                    alt="preview"
+                  />
 
-        <button
-          type="button"
-          className="remove-image"
-          onClick={() => {
-            const updatedImages = formData.images.filter(
-              (_, i) => i !== index
-            );
+                  <button
+                    type="button"
+                    className="remove-image"
+                    onClick={() => {
+                      const updatedImages = formData.product_images.filter(
+                        (_, i) => i !== index
+                      );
 
-            setFormData({
-              ...formData,
-              images: updatedImages
-            });
-          }}
-        >
-          ✕
-        </button>
+                      setFormData({
+                        ...formData,
+                        product_images: updatedImages
+                      });
+                    }}
+                  >
+                    ✕
+                  </button>
 
-      </div>
+                </div>
 
-    ))}
+              ))}
 
-  </div>
-)}
+            </div>
+          )}
         </div>
       </div>
 
@@ -205,3 +223,4 @@ export default function AddMarketplaceItem({ onPublish }) {
     </form>
   );
 }
+

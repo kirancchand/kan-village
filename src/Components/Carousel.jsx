@@ -2,53 +2,60 @@ import { useState, useEffect, useCallback } from "react";
 import http from "../utils/http";
 import { GET_VILLAGE_CAROUSEL } from "../utils/constants";
 export default function Carousel({ onLogin }) {
-const SLIDES = [
-  {
-    carousel_image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80",
-    carousel_name: "🌄 Welcome",
-    carousel_title: ["Where ", "Nature", " Meets Tradition"],
-    carousel_desc: "Nestled among emerald hills, our village breathes with ancient stories and vibrant life, connecting every soul to its roots.",
-  },
-  {
-    carousel_image: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1600&q=80",
-    carousel_name: "🌾 Our Fields",
-    carousel_title: ["Golden ", "Harvests", " Every Season"],
-    carousel_desc: "From paddy fields to coconut groves — the land that feeds and nurtures us all through every generation.",
-  },
-  {
-    carousel_image: "https://images.unsplash.com/photo-1519817650390-64a93db51149?w=1600&q=80",
-    carousel_name: "🎉 Culture",
-    carousel_title: ["Festivals Full of ", "Joy & Colour", ""],
-    carousel_desc: "Our celebrations echo through the hills — music, dance and togetherness binding every family.",
-  },
-  {
-    carousel_image: "https://images.unsplash.com/photo-1601158935942-52255782d322?w=1600&q=80",
-    carousel_name: "🏡 Community",
-    carousel_title: ["One Village, ", "One Heart", ""],
-    carousel_desc: "2,400 souls bound by love, respect and a shared dream for a brighter tomorrow.",
-  },
-];
+// const SLIDES = [
+//   {
+//     carousel_image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80",
+//     carousel_name: "🌄 Welcome",
+//     carousel_title: ["Where ", "Nature", " Meets Tradition"],
+//     carousel_desc: "Nestled among emerald hills, our village breathes with ancient stories and vibrant life, connecting every soul to its roots.",
+//   },
+//   {
+//     carousel_image: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1600&q=80",
+//     carousel_name: "🌾 Our Fields",
+//     carousel_title: ["Golden ", "Harvests", " Every Season"],
+//     carousel_desc: "From paddy fields to coconut groves — the land that feeds and nurtures us all through every generation.",
+//   },
+//   {
+//     carousel_image: "https://images.unsplash.com/photo-1519817650390-64a93db51149?w=1600&q=80",
+//     carousel_name: "🎉 Culture",
+//     carousel_title: ["Festivals Full of ", "Joy & Colour", ""],
+//     carousel_desc: "Our celebrations echo through the hills — music, dance and togetherness binding every family.",
+//   },
+//   {
+//     carousel_image: "https://images.unsplash.com/photo-1601158935942-52255782d322?w=1600&q=80",
+//     carousel_name: "🏡 Community",
+//     carousel_title: ["One Village, ", "One Heart", ""],
+//     carousel_desc: "2,400 souls bound by love, respect and a shared dream for a brighter tomorrow.",
+//   },
+// ];
 
-const [Slides, setSlides] = useState(SLIDES);
-const fetchCarousel = useCallback(async () => {
+const [Slides, setSlides] = useState([]);
+  useEffect(() => {
+    let cancelled = false;
+    const fetchCarousel = async () => {
     try {
       const res = await http.post(GET_VILLAGE_CAROUSEL);
       console.log("Fetched carousel data:", res.data);
-      setSlides(res.data);
+      if (!cancelled) setSlides(res.data);
     } catch (err) {
-      console.error("Failed to fetch app name", err);
+      console.error("Failed to fetch carousel", err);
     }
-  }, []);
-  useEffect(() => {
+    };
     fetchCarousel();
+    return () => { cancelled = true; };
   }, []);
 
   const [cur, setCur] = useState(0);
-  const go = useCallback((n) => setCur((n + Slides.length) % Slides.length), []);
+  const slideCount = Slides.length;
+  const go = useCallback((n) => {
+    if (slideCount === 0) return;
+    setCur((n + slideCount) % slideCount);
+  }, [slideCount]);
   useEffect(() => {
+    if (slideCount < 2) return;
     const t = setInterval(() => go(cur + 1), 5500);
     return () => clearInterval(t);
-  }, [cur, go]);
+  }, [cur, go, slideCount]);
   return (
     <div className="hero">
       <div className="hero-track" style={{ transform: `translateX(-${cur * 100}%)` }}>

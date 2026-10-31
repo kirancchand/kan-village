@@ -71,16 +71,19 @@ const handlePrev = async () => {
 };
 
   const [query, setQuery] = useState("");
-  const filtered = peoples.length>0?peoples.filter(
-    (p) =>
-      // console.log(p);
-      // console.log(p.villageapp_username.toLowerCase().includes(query.toLowerCase())||p.contact.toLowerCase().includes(query.toLowerCase()));
-      p.villageapp_username.toLowerCase().includes(query.toLowerCase()) ||
-      // p.ward.toLowerCase().includes(query.toLowerCase()) ||
-      p.contact.toLowerCase().includes(query.toLowerCase())
-      // return null;
+  // const filtered = peoples.length>0?peoples.filter(
+  //   (p) =>
+  //     // console.log(p);
+  //     // console.log(p.villageapp_username.toLowerCase().includes(query.toLowerCase())||p.contact.toLowerCase().includes(query.toLowerCase()));
+  //     // (p.villageapp_username!=null)?p.villageapp_username.toLowerCase().includes(query.toLowerCase()):"" ||
+  //     // // // p.ward.toLowerCase().includes(query.toLowerCase()) ||
+  //     // p.contact!=null?p.contact.toLowerCase().includes(query.toLowerCase()):""
 
-  ):[];
+  //     p.villageapp_username!=null?p.villageapp_username.toLowerCase():"" || p.contact!=null?p.contact.toLowerCase():""
+  //     // return null;
+
+  // ):[];
+
   return (
     <section className="sec ppl-sec">
       <SectionTitle chip="👥 Residents" title="Village Directory" subtitle="Search by name, ward or address to find any resident quickly." />
@@ -103,8 +106,9 @@ const handlePrev = async () => {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((p) => {
-              const ini = p.villageapp_username.split(" ").map((w) => w[0]).join("").slice(0, 2);
+            {peoples.map((p) => {
+              const ini = p.villageapp_username!=null? p.villageapp_username.split(" ").map((w) => w[0]).join("").slice(0, 2):"";
+              // const ini = p.villageapp_username[0];
               return (
                 <tr key={p.villageapp_userid}>
                   <td>
@@ -117,8 +121,8 @@ const handlePrev = async () => {
                     </div>
                   </td>
                   {/* <td style={{ color: "#64748b", fontWeight: 600, fontSize: "0.83rem" }}>{p.villageapp_ward}</td> */}
-                  <td style={{ color: "#64748b", fontSize: "0.82rem" }}>📍 {p.address}</td>
-                  <td><span className="ph-chip">📞 {p.contact}</span></td>
+                  <td style={{ color: "#64748b", fontSize: "0.82rem" }}>📍 {p.address!=""?p.address:"No Address"}</td>
+                  <td><span className="ph-chip">📞 {p.contact!=""?p.contact:"No Contact"}</span></td>
                 </tr>
               );
             })}

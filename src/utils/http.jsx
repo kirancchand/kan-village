@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { baseURL, appId,REQUEST_APPDATA } from './constants';
+import { baseURL, appId,REQUEST_APPDATA,GET_REFRESHEDTOKEN } from './constants';
 const http = axios.create({
 //   baseURL: baseURL
 });
@@ -9,41 +9,47 @@ http.interceptors.request.use((config) => {
   return config;
 });
 
-
 async function refreshToken() {
-    // try {
-    //   const response = await http({
+    try {
+    //   const response = await axios.post({
     //     method: 'GET',
-    //     url: ACCOUNTS_REFRESH,
+    //     url: GET_REFRESHEDTOKEN,
     //   })
+
+      const response = await axios.post(GET_REFRESHEDTOKEN, {refresh_token: localStorage.getItem("refresh_token")},
+                  {
+                    headers: {
+                      'Content-Type': 'application/json',
+                      // 'Access-Control-Allow-Origin': '*'
+                    }
+                  })
       
-    //   const { access_token, redirect_url } = response.data;
+      const { access_token, redirect_url } = response.data;
     //     //   console.log("response.data",response)
-    //   if(response.status==203){
+      if(response.status==203){
 
-    //     authService.logout()
-    //     redirectToLogin();//added to while refresh token become 203
-    //     return 
-    //   }
-    //   if(access_token!=undefined){
-    //     setLocalStorage(ACCESS_TOKEN_KEY,access_token)
-    //   }
-    //   // localStorage.setItem(ACCESS_TOKEN_KEY, access_token);
-    //   // console.log("AuthService - New access token saved to localStorage");
+        authService.logout()
+        redirectToLogin();//added to while refresh token become 203
+        return 
+      }
+      if(access_token!=undefined){
+        setLocalStorage("access_token",access_token)
+      }
+      // localStorage.setItem(ACCESS_TOKEN_KEY, access_token);
+      // console.log("AuthService - New access token saved to localStorage");
       
-    //   // If we have a redirect URL from refresh, go there
-    //   if (redirect_url) {
-    //     // console.log("AuthService - Redirecting after token refresh to:", redirect_url);
-    //     window.location.href = redirect_url;
-    //   }
+      // If we have a redirect URL from refresh, go there
+      if (redirect_url) {
+        // console.log("AuthService - Redirecting after token refresh to:", redirect_url);
+        window.location.href = redirect_url;
+      }
       
-    //   return access_token;
-    // } catch (error) {
+      return access_token;
+    } catch (error) {
 
-    //   removeAllLocalStorage()
-    //   return null;
-    // }
-    return true
+      removeAllLocalStorage()
+      return null;
+    }
 }
 
 
@@ -65,7 +71,8 @@ export async  function requestAppData() {
 }
 
 export function redirectToLogin() {
-
+    localStorage.clear();
+    window.location.href = "";
 }
 
 export function getAccessToken() {
